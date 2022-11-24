@@ -227,10 +227,11 @@ BEGIN
             ,NULL                                         AS TT2_VALOR_UC
             ,NULL                                         AS TT2_OBSERVACIONES
             ,CON.LOCALIZACION                             AS TT2_LOCALIZACION
-            ,COM.MUNICIPIO                                AS TT2_DEPARTAMENTO
-            ,COM.DEPARTAMENTO                             AS TT2_MINICIPIO
+            ,COM.MUNICIPIO                                AS TT2_MUNICIPIO
+            ,COM.DEPARTAMENTO                             AS TT2_DEPARTAMENTO
             ,/*TO_NUMBER(CON.TENSION)*/ 0                      AS TT2_NT_PRIMARIA
             ,/*TO_NUMBER(CON.TENSION_SECUNDARIA)*/ 0            AS TT2_NT_SECUNDARIA
+            ,0                                            AS TT2_NOREPORT_CREG
         BULK COLLECT INTO   V_QA_TTT2_REGISTRO
         FROM                CCONECTIVIDAD_E@GTECH  CON
             LEFT OUTER JOIN CCOMUN@GTECH           COM  ON  COM.G3E_FID            = CON.G3E_FID
@@ -433,6 +434,7 @@ BEGIN
         ,   T1. TT2_DEPARTAMENTO
         ,   T1. TT2_NT_PRIMARIA
         ,   T1. TT2_NT_SECUNDARIA
+        ,   T1. TT2_NOREPORT_CREG
         BULK COLLECT INTO V_QA_TTT2_REGISTRO
         FROM QA_TTT2_TEMP T1
         LEFT OUTER JOIN (SELECT TT2_CODIGOELEMENTO
