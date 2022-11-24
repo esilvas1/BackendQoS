@@ -1,0 +1,8 @@
+create table QA_TTIPOCARGA
+(
+    TIPOCARGA   VARCHAR2(4),
+    DESCRIPCION VARCHAR2(100)
+)
+/
+
+

@@ -1,0 +1,12 @@
+create table QA_TMETAS_CALINDIVIDUAL
+(
+    PERIODO  NUMBER,
+    GRUPO015 NUMBER,
+    NT       NUMBER,
+    DIUGJ    NUMBER,
+    FIUGJ    NUMBER,
+    POR_T    NUMBER
+)
+/
+
+

@@ -1,0 +1,9 @@
+create table QA_TPARIDAD_RECODIFICACION
+(
+    CODIGO        VARCHAR2(20),
+    BRA11_IUA_OLD VARCHAR2(20),
+    TT2_IUA_NEW   VARCHAR2(20)
+)
+/
+
+

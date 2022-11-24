@@ -1,0 +1,18 @@
+create table QA_TMUNDANE
+(
+    MUND_MUNDANE     NUMBER(10) not null,
+    MUND_DEPDANE     NUMBER(2),
+    MUND_DESCRIPCION VARCHAR2(60),
+    MUND_HABURB      NUMBER(10),
+    MUND_HABRUR      NUMBER(10),
+    MUND_IRURB       NUMBER(1),
+    MUND_IRRUR       NUMBER(1),
+    MUND_IRF         NUMBER(4, 2),
+    MUND_IR          NUMBER(1),
+    MUND_GRCU        NUMBER(2),
+    MUND_GRCR        NUMBER(2),
+    MUND_REGIONAL    VARCHAR2(50)
+)
+/
+
+

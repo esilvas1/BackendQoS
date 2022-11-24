@@ -1,0 +1,13 @@
+create table QA_TRIA_CNSD
+(
+    EVENTOID          NUMBER,
+    FECHAINI          DATE,
+    FECHAFIN          DATE,
+    ELEMENTO          VARCHAR2(10),
+    TIPOELEMENTO      NUMBER,
+    CAUSAREGISTRADAID NUMBER,
+    FECHAGENDOC       DATE
+)
+/
+
+

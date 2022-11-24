@@ -1,0 +1,12 @@
+create table QA_TLOG_EJECUCION
+(
+    FECHA_EJECUCION DATE,
+    NOMBRE_OBJ      VARCHAR2(20),
+    TIPO_OBJ        VARCHAR2(20),
+    USUARIO         VARCHAR2(100),
+    ESTADO          VARCHAR2(20),
+    OBSERVACIONES   VARCHAR2(200)
+)
+/
+
+
