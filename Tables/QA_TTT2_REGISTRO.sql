@@ -50,19 +50,17 @@ create table QA_TTT2_REGISTRO
 )
 /
 
-alter table QA_TTT2_REGISTRO
-drop column TT2_ACTIVO_NR;
+--Similars
+-- QA_TTT2_REGISTRO
 
--- obs, backup, temp
-alter table QA_TTT2_BRAFO
-drop column TT2_ACTIVO_NR;
+-- QA_TTT2_BRAFO
 
-alter table QA_TTT2_OBS
-drop column TT2_ACTIVO_NR;
+-- QA_TTT2_OBS
 
-alter table QA_TTT2_BACKUP
-drop column TT2_ACTIVO_NR;
+-- QA_TTT2_BACKUP
 
-alter table QA_TTT2_TEMP
-drop column TT2_ACTIVO_NR;
+-- QA_TTT2_TEMP
+
+
+
 
