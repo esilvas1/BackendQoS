@@ -154,7 +154,7 @@ BEGIN
             --CREACION DE BACKUP DE LA TABLA QA_TTT2_REGISTRO
             DELETE FROM BRAE.QA_TTT2_BACKUP;
             COMMIT;
-            INSERT INTO BRAE.QA_TTT2_BACKUP SELECT * FROM BRAE.QA_TTT2_REGISTO;
+            INSERT INTO BRAE.QA_TTT2_BACKUP SELECT * FROM BRAE.QA_TTT2_REGISTRO;
             COMMIT;
 
         END IF;
@@ -235,7 +235,7 @@ BEGIN
             ,COM.DEPARTAMENTO                             AS TT2_DEPARTAMENTO
             ,/*TO_NUMBER(CON.TENSION)*/ 0                      AS TT2_NT_PRIMARIA
             ,/*TO_NUMBER(CON.TENSION_SECUNDARIA)*/ 0            AS TT2_NT_SECUNDARIA
-            ,0                                            AS TT2_NOREPORT_CREG
+            ,0                                            AS TT2_ACTIVONR
         BULK COLLECT INTO   V_QA_TTT2_REGISTRO
         FROM                CCONECTIVIDAD_E@GTECH  CON
             LEFT OUTER JOIN CCOMUN@GTECH           COM  ON  COM.G3E_FID            = CON.G3E_FID
@@ -438,7 +438,7 @@ BEGIN
         ,   T1. TT2_DEPARTAMENTO
         ,   T1. TT2_NT_PRIMARIA
         ,   T1. TT2_NT_SECUNDARIA
-        ,   T1. TT2_NOREPORT_CREG
+        ,   T1. TT2_ACTIVONR
         BULK COLLECT INTO V_QA_TTT2_REGISTRO
         FROM QA_TTT2_TEMP T1
         LEFT OUTER JOIN (SELECT TT2_CODIGOELEMENTO
@@ -999,6 +999,7 @@ BEGIN
            ,T.TT2_PERIODO_OP             = TRUNC(FECHAOPERACION)
            ,T.TT2_ESTADOREPORTE          = 0
            ,T.TT2_OBSERVACIONES          = 'Transicion PLANEACION a OPERACION en BRA11'
+           ,T.TT2_ACTIVOPROVISIONAL      = 0
            ,T.TT2_CAPACIDAD              = (SELECT DISTINCT TT2_CAPACIDAD 
                                             FROM  QA_TTT2_TEMP 
                                             WHERE TT2_CODIGOELEMENTO = T.TT2_CODIGOELEMENTO 
