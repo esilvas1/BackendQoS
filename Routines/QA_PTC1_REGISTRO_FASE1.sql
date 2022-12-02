@@ -12,6 +12,7 @@ BEGIN
 
     IF TRUNC(FECHAOPERACION) = ADD_MONTHS(TO_DATE('01/'||SUBSTR(MAX_PERIODO_TC1,5,6)||'/'||SUBSTR(MAX_PERIODO_TC1,1,4),'DD/MM/YYYY'),1) 
        THEN -- PERMITE EJECUTARLO SOLO CUANDO SE ESTA REALIZANDO EL PERIODO ULTIMO FINALIZADO
+            --*falta configurarlo para que en ejecuciones del mismo no corrompa la informacion
 
             --ELIMINAR LOS USURIOS DE OTROS COMERCIALIZADORES
             DELETE FROM QA_TTC1_TEMP
@@ -33,7 +34,7 @@ BEGIN
             UPDATE QA_TTC1_TEMP
             SET 
                 TC1_CODCONEX =  TC1_CODTRANSF
-               ,TC1_TIPCONEX = 'T'
+               ,TC1_TIPCONEX = 'T'--Solucionar a futuro que no cambie los tipo P
             ;
             COMMIT
             ;
@@ -50,6 +51,8 @@ BEGIN
 
        
             --AGREGAMOS ESTOS USUARIOS DIRECTAMENTE DEL TC1 ANTERIOR(t-1) DEBIDO A UN ERROR EN LA DESCARGA SAC
+            --*Alzate se pondra en contacto con los desarrolladores de SAC a traves de mesa de ayuda para solucionar este inconveniente
+
             INSERT INTO QA_TTC1_TEMP
             SELECT * FROM QA_TTC1
             WHERE TC1_TC1 IN (      SELECT DISTINCT TC1_TC1 
