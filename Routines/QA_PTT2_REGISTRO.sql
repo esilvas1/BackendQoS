@@ -190,7 +190,7 @@ BEGIN
                    THEN('PLANEACION'         ) 
                    ELSE(COM.ESTADO           ) 
               END)                                        AS TT2_ESTADO_BRA11
-            ,'CREG 015'                                   AS TT2_RESMETODOLOGIA
+            ,'015-2018'                                   AS TT2_RESMETODOLOGIA
             ,NULL                                         AS TT2_CLASS_CARGA --GESTIONADO POR PROCEDIMIENTO
             ,SUBSTR(CON.CIRCUITO,1,20)                    AS TT2_NOMBRE_CIRCUITO
             ,SUBSTR(TT1.TT1_CODIGOCIRCUITO,1,5)           AS TT2_IUL
