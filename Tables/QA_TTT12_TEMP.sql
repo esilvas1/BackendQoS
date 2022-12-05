@@ -5,7 +5,8 @@ create table QA_TTT12_TEMP
     TT12_FFINAL       VARCHAR2(30),
     TT12_DURACION     VARCHAR2(20),
     TT12_CIRCUITOS    VARCHAR2(400),
-    TT12_ID           NUMBER
+    TT12_ID           NUMBER,
+    TT12_ACTIVIDAD    VARCHAR2(100)
 )
 /
 

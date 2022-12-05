@@ -68,7 +68,7 @@ BEGIN
                 SELECT  TRUNC(FECHAOPERACION)                          AS TT3_PERIODO_OP
                       , RG.TT3_IUS                                     AS IUS
                       , 1                                              AS CLASIFICACION
-                      , AF.TT3_IUL                                     AS CODIGOS_TRF_CIR --CRUCE TC1
+                      , AF.TT3_IUL                                     AS CODIGOS_TRF_CIR --CRUCE
                       , RG.TT3_FINICIAL                                AS FECHA_INICIAL
                       , RG.TT3_FFINAL                                  AS FECHA_FINAL
                       , TRIM(REPLACE(REPLACE(REPLACE(RG.TT3_ALCANCE,CHR(10),' ') ,CHR(13),' ') ,'  ',' '))   AS TT3_ALCANCE
