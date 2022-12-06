@@ -27,10 +27,9 @@ BEGIN
       ;    
         
         
-        IF CANT_REG_TT2 > 0 AND
-           AJUSTADO     = 0
+        IF CANT_REG_TT2 > 0
+           --AND AJUSTADO     = 0
            THEN
-        
             --AGREGAR REGISTROS CALP DESDE TT2 --Autogeneracion (por replicas de reportes)
             DELETE FROM QA_TTC1_TEMP
             WHERE TC1_TC1 LIKE 'CALP%';
@@ -49,14 +48,14 @@ BEGIN
                 ,	(CASE WHEN(TT2_LOCALIZACION = 'AEREO'      ) THEN('1')
                           WHEN(TT2_LOCALIZACION = 'SUBTERRANEO') THEN('2')
                     END) AS	TC1_CONEXRED
-                ,	(CASE WHEN(TT2_MUNICIPIO IN ('VILLA DEL ROSARIO','C�CUTA','LOS PATIOS'))
+                ,	(CASE WHEN(TT2_MUNICIPIO IN ('VILLA DEL ROSARIO','CÚCUTA','LOS PATIOS'))
                           THEN('564')
                           ELSE('604')
                      END)  AS	TC1_IDCOMER
                 ,	161  AS	TC1_IDMERC
                 ,   TT2_GRUPOCALIDAD AS	TC1_GC
                 ,	(CASE WHEN(TT2_MUNICIPIO = 'LOS PATIOS'       ) THEN('FRT28459')
-                          WHEN(TT2_MUNICIPIO = 'C�CUTA'           ) THEN('FRT28702')
+                          WHEN(TT2_MUNICIPIO = 'CÚCUTA'           ) THEN('FRT28702')
                           WHEN(TT2_MUNICIPIO = 'VILLA DEL ROSARIO') THEN('FRT28703')
                           ELSE('OR0001')
                      END)  AS	TC1_CODFRONCOM
@@ -98,10 +97,11 @@ BEGIN
             ;            
             COMMIT
             ;
-            
+
+
             /*ACTUALIZACION DE LOS CAMPOS TC1_IUA, TC1_CODTRANSF, TC1_CODCIR, TC1_GC---
             A TRAVES DE LEFT OUTER JOIN E INSERT Y DELETE SOBRE LA MISMA TABLA QA_TTC1_TEMP*/
-            
+
             UPDATE BRAE.QA_TTC1_TEMP
             SET TC1_PERIODO = NULL
             WHERE TC1_PERIODO IS NOT NULL
@@ -124,11 +124,11 @@ BEGIN
                                WHEN (TC1_TIPCONEX = 'T' AND TC1_CODCONEX     LIKE 'ALPM%') THEN (TO_CHAR(MUND_GRCU))
                           END),'NA') AS TC1_GC
                     ,TC1_CODFRONCOM
-                    ,NVL((CASE WHEN (TC1_TIPCONEX = 'P'                                  ) THEN ('XYZ'       )--SOLUCIONAR ASIGNACION PARA TIPOS P 
+                    ,NVL((CASE WHEN (TC1_TIPCONEX = 'P'                                  ) THEN (TC1_CODCIRC )
                                WHEN (TC1_TIPCONEX = 'T' AND TC1_CODCONEX NOT LIKE 'ALPM%') THEN (TT2_IUL     )
-                               WHEN (TC1_TIPCONEX = 'T' AND TC1_CODCONEX     LIKE 'ALPM%') THEN (NULL        )
+                               WHEN (TC1_TIPCONEX = 'T' AND TC1_CODCONEX     LIKE 'ALPM%') THEN (TC1_CODCIRC )
                           END),'NA') AS TC1_CODCIRC
-                    ,NVL((CASE WHEN (TC1_TIPCONEX = 'P'                                  ) THEN (NULL        ) 
+                    ,NVL((CASE WHEN (TC1_TIPCONEX = 'P'                                  ) THEN (TC1_CODCIRC )
                                WHEN (TC1_TIPCONEX = 'T' AND TC1_CODCONEX NOT LIKE 'ALPM%') THEN (TT2_CODE_IUA)
                                WHEN (TC1_TIPCONEX = 'T' AND TC1_CODCONEX     LIKE 'ALPM%') THEN ('ALPM0001'  )
                           END),'NA') AS TC1_CODTRANSF
@@ -151,7 +151,7 @@ BEGIN
                     ,TC1_CONTRESP
                     ,TC1_CAPCONTRESP
                     ,TO_NUMBER(TO_CHAR(FECHAOPERACION,'YYYYMM')) AS TC1_PERIODO
-                    ,NVL((CASE WHEN (TC1_TIPCONEX = 'P'                                  ) THEN ('XYZ'       ) 
+                    ,NVL((CASE WHEN (TC1_TIPCONEX = 'P'                                  ) THEN (TC1_CODCIRC )
                                WHEN (TC1_TIPCONEX = 'T' AND TC1_CODCONEX NOT LIKE 'ALPM%') THEN (TT2_CODE_IUA)
                                WHEN (TC1_TIPCONEX = 'T' AND TC1_CODCONEX     LIKE 'ALPM%') THEN ('ALPM0001'  )
                           END),'NA') AS TC1_IUA
@@ -174,7 +174,8 @@ BEGIN
             ;     
 
             --REVISAR LOS REGISTROS SIN IUA Y PASARLOS A TABLA DE OBSERVACIONES DE TC1
-            
+
+            /*
             DELETE FROM QA_TTC1_OBS
             WHERE TC1_PERIODO = TO_NUMBER(TO_CHAR(FECHAOPERACION,'YYYYMM'))
             ;
@@ -193,10 +194,8 @@ BEGIN
             ;
             COMMIT
             ;
-
             --REVISAR LOS REGISTROS SIN IUL Y PASARLOS A TABLA DE OBSERVACIONES DE TC1
             
-            /*
             INSERT   INTO QA_TTC1_OBS
             SELECT * FROM QA_TTC1_TEMP
             WHERE TC1_CODCIRC = 'NA'
