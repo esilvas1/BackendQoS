@@ -119,19 +119,19 @@ BEGIN
                     ,TC1_CONEXRED
                     ,TC1_IDCOMER
                     ,TC1_IDMERC
-                    ,NVL((CASE WHEN (TC1_TIPCONEX = 'P'                                  ) THEN (TC1_GC            ) 
-                               WHEN (TC1_TIPCONEX = 'T' AND TC1_CODCONEX NOT LIKE 'ALPM%') THEN (TT2_GRUPOCALIDAD  )
-                               WHEN (TC1_TIPCONEX = 'T' AND TC1_CODCONEX     LIKE 'ALPM%') THEN (TO_CHAR(MUND_GRCU))
-                          END),'NA') AS TC1_GC
+                    ,(CASE WHEN (TC1_TIPCONEX = 'P'                                  ) THEN (TC1_GC                    )
+                           WHEN (TC1_TIPCONEX = 'T' AND TC1_CODCONEX NOT LIKE 'ALPM%') THEN (NVL(TT2_GRUPOCALIDAD,'NA'))
+                           WHEN (TC1_TIPCONEX = 'T' AND TC1_CODCONEX     LIKE 'ALPM%') THEN (TO_CHAR(MUND_GRCU)        )
+                      END) AS TC1_GC
                     ,TC1_CODFRONCOM
-                    ,NVL((CASE WHEN (TC1_TIPCONEX = 'P'                                  ) THEN (TC1_CODCIRC )
-                               WHEN (TC1_TIPCONEX = 'T' AND TC1_CODCONEX NOT LIKE 'ALPM%') THEN (TT2_IUL     )
-                               WHEN (TC1_TIPCONEX = 'T' AND TC1_CODCONEX     LIKE 'ALPM%') THEN (TC1_CODCIRC )
-                          END),'NA') AS TC1_CODCIRC
-                    ,NVL((CASE WHEN (TC1_TIPCONEX = 'P'                                  ) THEN (TC1_CODCIRC )
-                               WHEN (TC1_TIPCONEX = 'T' AND TC1_CODCONEX NOT LIKE 'ALPM%') THEN (TT2_CODE_IUA)
-                               WHEN (TC1_TIPCONEX = 'T' AND TC1_CODCONEX     LIKE 'ALPM%') THEN ('ALPM0001'  )
-                          END),'NA') AS TC1_CODTRANSF
+                    ,(CASE WHEN (TC1_TIPCONEX = 'P'                                  ) THEN (TC1_CODCIRC      )
+                           WHEN (TC1_TIPCONEX = 'T' AND TC1_CODCONEX NOT LIKE 'ALPM%') THEN (NVL(TT2_IUL,'NA'))
+                           WHEN (TC1_TIPCONEX = 'T' AND TC1_CODCONEX     LIKE 'ALPM%') THEN (NULL             )
+                      END) AS TC1_CODCIRC
+                    ,(CASE WHEN (TC1_TIPCONEX = 'P'                                  ) THEN (NULL                  )
+                           WHEN (TC1_TIPCONEX = 'T' AND TC1_CODCONEX NOT LIKE 'ALPM%') THEN (NVL(TT2_CODE_IUA,'NA'))
+                           WHEN (TC1_TIPCONEX = 'T' AND TC1_CODCONEX     LIKE 'ALPM%') THEN ('ALPM0001'            )
+                      END) AS TC1_CODTRANSF
                     ,TC1_CODDANE
                     ,TC1_UBIC
                     ,TC1_DIREC
@@ -151,10 +151,10 @@ BEGIN
                     ,TC1_CONTRESP
                     ,TC1_CAPCONTRESP
                     ,TO_NUMBER(TO_CHAR(FECHAOPERACION,'YYYYMM')) AS TC1_PERIODO
-                    ,NVL((CASE WHEN (TC1_TIPCONEX = 'P'                                  ) THEN (TC1_CODCIRC )
-                               WHEN (TC1_TIPCONEX = 'T' AND TC1_CODCONEX NOT LIKE 'ALPM%') THEN (TT2_CODE_IUA)
-                               WHEN (TC1_TIPCONEX = 'T' AND TC1_CODCONEX     LIKE 'ALPM%') THEN ('ALPM0001'  )
-                          END),'NA') AS TC1_IUA
+                    ,(CASE WHEN (TC1_TIPCONEX = 'P'                                  ) THEN (TC1_CODCIRC           )
+                           WHEN (TC1_TIPCONEX = 'T' AND TC1_CODCONEX NOT LIKE 'ALPM%') THEN (NVL(TT2_CODE_IUA,'NA'))
+                           WHEN (TC1_TIPCONEX = 'T' AND TC1_CODCONEX     LIKE 'ALPM%') THEN ('ALPM0001'            )
+                      END) AS TC1_IUA
             FROM BRAE.QA_TTC1_TEMP 
             LEFT OUTER JOIN (SELECT TT2_CODIGOELEMENTO
                                    ,TT2_CODE_IUA
@@ -175,7 +175,7 @@ BEGIN
 
             --REVISAR LOS REGISTROS SIN IUA Y PASARLOS A TABLA DE OBSERVACIONES DE TC1
 
-            /*
+            /* ******************************************************temporal meintras se hacen pruebas diciembre 2022
             DELETE FROM QA_TTC1_OBS
             WHERE TC1_PERIODO = TO_NUMBER(TO_CHAR(FECHAOPERACION,'YYYYMM'))
             ;
@@ -194,6 +194,8 @@ BEGIN
             ;
             COMMIT
             ;
+            */
+
             --REVISAR LOS REGISTROS SIN IUL Y PASARLOS A TABLA DE OBSERVACIONES DE TC1
             
             INSERT   INTO QA_TTC1_OBS
@@ -208,11 +210,74 @@ BEGIN
             ;
             COMMIT
             ;
-            */
+
             
-            --REVISAR LA ASIGNACION DE IUL PARA LOS CIRCUITOS COMO SEVC19 ENTRE OTROS
-           
             --VERIFICACION DE QUE LOS USUARIOS NO APAREZCAN MAS DE DOS VECES, TENIENDO EN CUENTA LOS CAMBIOS ENTRE COMERCIALIZADORA
+
+            insert into QA_TTC1_TEMP
+            select distinct
+                    TC1_TC1
+            ,	TC1_CODCONEX
+            ,	TC1_TIPCONEX
+            ,	TC1_NT
+            ,	TC1_NTP
+            ,	TC1_PROPACTIV
+            ,	TC1_CONEXRED
+            ,	TC1_IDCOMER
+            ,	TC1_IDMERC
+            ,	TC1_GC
+            ,	TC1_CODFRONCOM
+            ,	TC1_CODCIRC
+            ,	TC1_CODTRANSF
+            ,	TC1_CODDANE
+            ,	TC1_UBIC
+            ,	TC1_DIREC
+            ,	TC1_CONESP
+            ,	TC1_CODARESP
+            ,	TC1_TIPARESP
+            ,	TC1_ESTSECT
+            ,	TC1_ALTITUD
+            ,	TC1_LONGITUD
+            ,	TC1_LATITUD
+            ,	TC1_AUTOGEN
+            ,	TC1_EXPENER
+            ,	TC1_CAPAUTOGENR
+            ,	TC1_TIPGENR
+            ,	TC1_CODFRONEXP
+            ,	TC1_FENTGEN
+            ,	TC1_CONTRESP
+            ,	TC1_CAPCONTRESP
+            ,	null as TC1_PERIODO
+            ,	TC1_IUA
+                from QA_TTC1_TEMP
+                where TC1_TC1||TC1_IDCOMER in (
+                                                select TC1_TC1||TC1_IDCOMER
+                                                from QA_TTC1_TEMP
+                                                group by TC1_TC1,TC1_IDCOMER
+                                                having  count(TC1_TC1||TC1_IDCOMER) > 1
+                    );
+
+
+
+            delete
+                from QA_TTC1_TEMP
+                where TC1_TC1||TC1_IDCOMER in (
+                                                select TC1_TC1||TC1_IDCOMER
+                                                from QA_TTC1_TEMP
+                                                group by TC1_TC1,TC1_IDCOMER
+                                                having  count(TC1_TC1||TC1_IDCOMER) > 1
+                                              )
+                and TC1_PERIODO is not null;
+
+            update QA_TTC1_TEMP
+            set TC1_PERIODO = TO_NUMBER(TO_CHAR(FECHAOPERACION,'YYYYMM'))
+            where TC1_PERIODO is null;
+
+            commit;
+
+
+
+
             --REALIZAR CODIGO PARA LA GESTION DE LA TRANSICION DE LOS USUARIOS ENTRE COMERCIALIZADORAS PARA ELIMINACION Y ADICION
             --ACTUALIZAR INFORMACION GENERAL DE LOS USUARIOS DE COMERCIALIZADORA CONTRASTADO CON EL ARCHIVO DE DESCARGA SAC
             
