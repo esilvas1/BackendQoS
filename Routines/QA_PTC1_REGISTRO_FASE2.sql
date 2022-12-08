@@ -255,9 +255,8 @@ BEGIN
                                                 from QA_TTC1_TEMP
                                                 group by TC1_TC1,TC1_IDCOMER
                                                 having  count(TC1_TC1||TC1_IDCOMER) > 1
-                    );
-
-
+                                              )
+            ;
 
             delete
                 from QA_TTC1_TEMP
@@ -267,11 +266,12 @@ BEGIN
                                                 group by TC1_TC1,TC1_IDCOMER
                                                 having  count(TC1_TC1||TC1_IDCOMER) > 1
                                               )
-                and TC1_PERIODO is not null;
+                and TC1_PERIODO is not null
+            ;
 
             update QA_TTC1_TEMP
-            set TC1_PERIODO = TO_NUMBER(TO_CHAR(FECHAOPERACION,'YYYYMM'))
-            where TC1_PERIODO is null;
+            set    TC1_PERIODO = TO_NUMBER(TO_CHAR(FECHAOPERACION,'YYYYMM'))
+            where  TC1_PERIODO is null;
 
             commit;
 
