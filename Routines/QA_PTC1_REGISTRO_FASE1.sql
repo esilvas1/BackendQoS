@@ -39,12 +39,13 @@ BEGIN
             COMMIT
             ;
             
-            --AGREGAR REGISTROS DE COMERCIALIZADORAS (PASO QUE SE EJECUTA UNA UNICA VEZ)
+            --AGREGAR REGISTROS DE COMERCIALIZADORAS  TIPO T (PASO QUE SE EJECUTA UNA UNICA VEZ)
             INSERT INTO QA_TTC1_TEMP
             SELECT * FROM QA_TTC1
             WHERE TC1_IDCOMER <> '604'
             AND   TC1_PERIODO =  MAX_PERIODO_TC1
             AND   TC1_TC1 NOT LIKE 'CALP%'
+            AND   TC1_TIPCONEX = 'T'
             ;
             COMMIT
             ;
