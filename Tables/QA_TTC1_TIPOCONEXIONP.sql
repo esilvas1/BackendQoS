@@ -1,4 +1,4 @@
-create table QA_TTC1_TIPOCONEXIONP
+create table QA_TTC1_USRS_TIPOP
 (
     TC1_TC1         VARCHAR2(20),
     TC1_CODCONEX    VARCHAR2(20),
