@@ -53,8 +53,6 @@ BEGIN
             COMMIT
             ;
 
-
-       
             --AGREGAMOS ESTOS USUARIOS DIRECTAMENTE DEL TC1 ANTERIOR(t-1) DEBIDO A UN ERROR EN LA DESCARGA SAC
             --*Alzate se pondra en contacto con los desarrolladores de SAC a traves de mesa de ayuda para solucionar este inconveniente
 

@@ -30,6 +30,7 @@ BEGIN
         IF CANT_REG_TT2 > 0
            --AND AJUSTADO     = 0
            THEN
+
             --AGREGAR REGISTROS CALP DESDE TT2 --Autogeneracion (por replicas de reportes)
             DELETE FROM QA_TTC1_TEMP
             WHERE TC1_TC1 LIKE 'CALP%';
@@ -98,6 +99,12 @@ BEGIN
             COMMIT
             ;
 
+            /*AGREGAR LOS REGISTRO DE LA TABLA OBSERVACION; esto con el fin de poder ejecutar varias veces*/
+
+            INSERT INTO QA_TTC1_TEMP
+            SELECT * FROM QA_TTC1_OBS
+                WHERE TC1_PERIODO = TO_NUMBER(TO_CHAR(FECHAOPERACION,'YYYYMM'));
+            COMMIT;
 
             /*ACTUALIZACION DE LOS CAMPOS TC1_IUA, TC1_CODTRANSF, TC1_CODCIR, TC1_GC---
             A TRAVES DE LEFT OUTER JOIN E INSERT Y DELETE SOBRE LA MISMA TABLA QA_TTC1_TEMP*/
@@ -175,7 +182,6 @@ BEGIN
 
             --REVISAR LOS REGISTROS SIN IUA Y PASARLOS A TABLA DE OBSERVACIONES DE TC1
 
-            /* ******************************************************temporal meintras se hacen pruebas diciembre 2022
             DELETE FROM QA_TTC1_OBS
             WHERE TC1_PERIODO = TO_NUMBER(TO_CHAR(FECHAOPERACION,'YYYYMM'))
             ;
@@ -194,7 +200,7 @@ BEGIN
             ;
             COMMIT
             ;
-            */
+
 
             --REVISAR LOS REGISTROS SIN IUL Y PASARLOS A TABLA DE OBSERVACIONES DE TC1
             
