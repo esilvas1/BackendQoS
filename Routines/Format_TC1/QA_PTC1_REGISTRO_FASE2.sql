@@ -337,8 +337,8 @@ BEGIN
                                               )
             WHERE    FDD_PERIODO_OP = TRUNC(ADD_MONTHS(FECHAOPERACION,1))                              
             ;
-            COMMIT;*/        
-            
+            COMMIT;*/
+
             DBMS_OUTPUT.PUT_LINE('Se ha actualizado el formato TC1 para el periodo: '||FECHAOPERACION);
 
 

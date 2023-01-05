@@ -84,8 +84,8 @@ BEGIN
             COMMIT;
             
             UPDATE QA_TTC1_TEMP
-            SET TC1_TIPCONEX='T'
-            WHERE TC1_TIPCONEX='2';
+            SET TC1_TIPCONEX = 'T'
+            WHERE TC1_TIPCONEX = '2';
             COMMIT;
             DBMS_OUTPUT.PUT_LINE('SUCESSFUL EJECUTION TWO'); 
             DBMS_OUTPUT.PUT_LINE('PLEASE EXECUTE THE PROCEDURE QA_PTT2_REGISTRO()'); 
