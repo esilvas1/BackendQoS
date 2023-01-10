@@ -290,6 +290,16 @@ BEGIN
             OR    INSTR(TC1_LONGITUD,',') > 0;
             COMMIT;
 
+            --GIRAR LOS DATOS CRUZADOS DE LOS CAMPOS LATITUD Y LONGITUD
+            UPDATE QA_TTC1_TEMP
+            SET   TC1_LATITUD  = TC1_LONGITUD,
+                  TC1_LONGITUD = TC1_LATITUD
+            WHERE TC1_LONGITUD IS NOT NULL
+            AND TO_NUMBER(REPLACE(TC1_LONGITUD,'.',',')) > 0
+            OR  TO_NUMBER(REPLACE(TC1_LATITUD,'.',',')) < 0
+            OR  TC1_LATITUD = TC1_LONGITUD
+            ;
+            COMMIT;
 
 
 
