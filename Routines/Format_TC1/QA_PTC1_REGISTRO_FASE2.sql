@@ -330,7 +330,7 @@ BEGIN
 
             --IDENTIFICAR LOS CODIGOS DANE QUE NO PERTENCEN AL AREA DE INFLUENCIA DE CENS
             UPDATE QA_TTC1_TEMP
-            SET TC1_CODDANE = TC1_CODDANE||'*'
+            SET TC1_CODDANE = TC1_CODDANE||'00'
             WHERE TC1_CODDANE IN (
                                  SELECT DISTINCT TC1_CODDANE
                                  FROM QA_TTC1_TEMP
