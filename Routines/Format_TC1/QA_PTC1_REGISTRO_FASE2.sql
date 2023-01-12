@@ -295,8 +295,8 @@ BEGIN
             SET   TC1_LATITUD  = TC1_LONGITUD,
                   TC1_LONGITUD = TC1_LATITUD
             WHERE TC1_LONGITUD IS NOT NULL
-            AND TO_NUMBER(REPLACE(TC1_LONGITUD,'.',',')) > 0
-            OR  TO_NUMBER(REPLACE(TC1_LATITUD,'.',',')) < 0
+            AND TO_NUMBER(REPLACE(TC1_LONGITUD,'.',',')) > (-66.84833333)
+            OR  TO_NUMBER(REPLACE(TC1_LATITUD,'.',',')) < (-4.208333333)
             OR  TC1_LATITUD = TC1_LONGITUD
             ;
             COMMIT;
