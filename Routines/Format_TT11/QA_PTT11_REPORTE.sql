@@ -54,7 +54,7 @@ BEGIN
             
                 SELECT  TRUNC(FECHAOPERACION)                          AS PERIODO_OP
                       , RG.TT11_ID                                     AS IDENTIFICACION  
-                      , TO_NUMBER(CASE WHEN(RG.TT11_TIPOPROYECTO='EXPANSION')  THEN '2'
+                      , TO_NUMBER(CASE WHEN(RG.TT11_TIPOPROYECTO='MODERNIZACION')  THEN '2'
                                        WHEN(RG.TT11_TIPOPROYECTO='REPOSICION') THEN '1'                       
                          END)                                          AS ACTIVIDAD
                       , TRIM(REPLACE(REPLACE(REPLACE(RG.TT11_ALCANCE,CHR(10),' ') ,CHR(13),' ') ,'  ',' '))   AS OBJETIVO
@@ -78,7 +78,7 @@ BEGIN
 
                 SELECT  TRUNC(FECHAOPERACION)                          AS PERIODO_OP
                       , RG.TT11_ID                                     AS IDENTIFICACION  
-                      , TO_NUMBER(CASE WHEN(RG.TT11_TIPOPROYECTO='EXPANSION')  THEN '2'
+                      , TO_NUMBER(CASE WHEN(RG.TT11_TIPOPROYECTO='MODERNIZACION')  THEN '2'
                                        WHEN(RG.TT11_TIPOPROYECTO='REPOSICION') THEN '1'                       
                          END)                                          AS ACTIVIDAD
                       , TRIM(REPLACE(REPLACE(REPLACE(RG.TT11_ALCANCE,CHR(10),' ') ,CHR(13),' ') ,'  ',' '))   AS OBJETIVO
