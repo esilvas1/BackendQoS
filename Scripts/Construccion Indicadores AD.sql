@@ -4,7 +4,6 @@ CREATE TABLE QA_TFDDCAUSAS_BT
 AS
 SELECT * FROM QA_TFDDCAUSAS;
 
-
 DELETE FROM QA_TFDDCAUSAS_BT;
 COMMIT;
 
@@ -13,6 +12,8 @@ SELECT*FROM QA_TFDDCAUSAS_BT;
 DELETE FROM QA_TFDDREGISTRO_AD;
 
 COMMIT;
+
+/* 1. LLENADO DE LA TABLA DE REGISTROS DE EVENTOS DE BAJA TENSION************************************************/
 
 INSERT INTO QA_TFDDREGISTRO_AD
 select DISTINCT
@@ -56,18 +57,32 @@ left join BRAE.QA_TFDDCAUSAS_BT CBT ON cbt.fdc_causa_oms = c.code
 left join (
             SELECT A.TC1_TC1 ||'-'|| TC1_PERIODO as clienteperiodo, A.TC1_TC1 as CLIENTE, TC1_PERIODO AS PERIODO_TC1
             FROM BRAE.QA_TTC1 A
-            WHERE TC1_PERIODO > ='201901'
-            ) x on A.CLI_ID||'-'||to_char(b.eve_fecha_inicial,'YYYYMM')=x.clienteperiodo
+            WHERE TC1_PERIODO >= '202201'
+            ) x on A.CLI_ID||'-'||to_char(b.eve_fecha_inicial,'YYYYMM') = x.clienteperiodo
 
-where b.eve_fecha_inicial >= DATE'2019-01-01'
-and b.eve_fecha_inicial < DATE'2022-01-01'
+where b.eve_fecha_inicial >= DATE'2022-01-01'
+and b.eve_fecha_inicial < DATE'2023-01-01'
 and c.code like ('8%')
 and X.CLIENTE is not null
 --AND X.CLIENTE = '589172'
 --and cev.cev_codigo is null
 order by 1;
 
---COMMIT;
+COMMIT;
+
+--corroborar existencia unica de la llaven evento elemento
+SELECT FDD_CODIGOEVENTO||FDD_CODIGOELEMENTO, COUNT(FDD_CODIGOEVENTO||FDD_CODIGOELEMENTO)
+FROM QA_TFDDREGISTRO_AD
+HAVING COUNT(FDD_CODIGOEVENTO||FDD_CODIGOELEMENTO)>1
+GROUP BY FDD_CODIGOEVENTO||FDD_CODIGOELEMENTO;
+
+/**************************************************************************************************/
+
+
+
+SELECT TO_DATE(:PERIODO,'DD/MM/YYYY') FROM DUAL;
+
+SELECT MIN(FDD_FINICIAL) FROM QA_TFDDREGISTRO_AD;
 
 
 select 
@@ -131,18 +146,17 @@ SELECT * FROM QA_TCSU
 WHERE CSU_NIU = '121122121';
 
 
-
 SELECT FDD_CODIGOELEMENTO AS CSU_NIU
       ,SUM(
            (CASE WHEN (FDD_FFINAL >= ADD_MONTHS(TO_DATE(:FECHAOPERACION,'DD/MM/YYYY'),+1) OR FDD_FFINAL IS NULL )
                  THEN
-                  (ADD_MONTHS(TO_DATE(:FECHAOPERACION,'DD/MM/YYYY'),+1) - FDD_FINICIAL)*24
+                  (ADD_MONTHS(TO_DATE(:FECHAOPERACION,'DD/MM/YYYY'), + 1) - FDD_FINICIAL) * 24
                  ELSE
                     CASE WHEN (FDD_FINICIAL < TO_DATE(:FECHAOPERACION,'DD/MM/YYYY'))
                     THEN
-                       (FDD_FFINAL - TO_DATE(:FECHAOPERACION,'DD/MM/YYYY'))*24
+                       (FDD_FFINAL - TO_DATE(:FECHAOPERACION,'DD/MM/YYYY')) * 24
                     ELSE
-                     (FDD_FFINAL - FDD_FINICIAL)*24
+                     (FDD_FFINAL - FDD_FINICIAL) * 24
                      END
             END)       
       ) AS CSU_DIUM
@@ -171,19 +185,23 @@ WHERE CSU_NIU = '1354653215';
 SELECT * FROM QA_TCSX_AD;
 
 
+/* 2. llenar tabla QA_TCSX_AD ********************************************
+   PERIODO POR PERIODOS MENSUALES*/
+
 --INSERCCION DE VALORES A LA TABLA QA_TCSX_AD
+
 INSERT INTO QA_TCSX_AD
 SELECT FDD_CODIGOELEMENTO AS CSU_NIU
       ,SUM(
-           (CASE WHEN (FDD_FFINAL >= ADD_MONTHS(TO_DATE(:FECHAOPERACION,'DD/MM/YYYY'),+1) OR FDD_FFINAL IS NULL )
+           (CASE WHEN (FDD_FFINAL >= ADD_MONTHS(TO_DATE(:FECHAOPERACION,'DD/MM/YYYY'), + 1) OR FDD_FFINAL IS NULL)
                  THEN
-                  (ADD_MONTHS(TO_DATE(:FECHAOPERACION,'DD/MM/YYYY'),+1) - FDD_FINICIAL)*24
+                  (ADD_MONTHS(TO_DATE(:FECHAOPERACION,'DD/MM/YYYY'), + 1) - FDD_FINICIAL) * 24
                  ELSE
                     CASE WHEN (FDD_FINICIAL < TO_DATE(:FECHAOPERACION,'DD/MM/YYYY'))
                     THEN
-                       (FDD_FFINAL - TO_DATE(:FECHAOPERACION,'DD/MM/YYYY'))*24
+                       (FDD_FFINAL - TO_DATE(:FECHAOPERACION,'DD/MM/YYYY')) * 24
                     ELSE
-                     (FDD_FFINAL - FDD_FINICIAL)*24
+                     (FDD_FFINAL - FDD_FINICIAL) * 24
                      END
             END)       
       ) AS CSU_DIUM
@@ -195,6 +213,9 @@ AND FDD_EXCLUSION =  'NO EXCLUIDA'
 GROUP BY FDD_CODIGOELEMENTO;
 
 COMMIT;
+
+/**************************************************************************************************************/
+
 
 
 SELECT * FROM QA_TFDDREGISTRO_AD
@@ -522,7 +543,9 @@ COMMIT;
 SELECT TO_NUMBER(TO_CHAR(LAST_DAY(SYSDATE),'DD'))*24 FROM DUAL;
 
 
+/* 3. LLENAR TABLA QA_TCSU_AD CON LAS ALTERACIONES EN ALGUNOS REGISTROS SEGUN EVENTOS BT
 
+*/
 INSERT INTO QA_TCSU_AD
 SELECT T1.	CSU_NIU
 ,(CASE WHEN(T1.CSU_DIUM + NVL(T2.CSU_DIUM,0)<TO_NUMBER(TO_CHAR(LAST_DAY(TO_DATE(:PERIODO,'DD/MM/YYYY')),'DD'))*24) 
@@ -604,7 +627,7 @@ WHERE T1.CSU_PERIODO_OP=TO_DATE(:PERIODO,'DD/MM/YYYY')
 ;
 
 COMMIT;
-
+/*  ************************************************************************************************ */
 --GENERAR CS1_AD
 
 CREATE TABLE QA_TCS1_AD
@@ -615,20 +638,23 @@ WHERE CS1_PERIODO_OP=DATE'2022-07-01';
 
 SELECT * FROM QA_TCS1_AD;
 
-
+--COMPARACION
 SELECT * FROM QA_TCS1
 WHERE CS1_PERIODO_OP=DATE'2019-02-01'
 UNION ALL
 SELECT * FROM QA_TCS1_AD
 WHERE CS1_PERIODO_OP=DATE'2019-02-01';
-
-
+/* 4.  ****************************************************/
+--SE EJUCTA PROCEDIMIENTO
 EXEC QA_PCS1_AD(DATE'2019-02-01');
+/***************************************************************/
+
 
 SELECT T1.CSU_NIU,(T2.CSU_DIUM-T1.CSU_DIUM) AS DIF_DIU ,(T2.CSU_FIUM-T1.CSU_FIUM) AS DIF_FIU
 FROM QA_TCSU T1
 LEFT OUTER JOIN (SELECT * FROM QA_TCSU_AD WHERE CSU_PERIODO_OP=DATE'2019-01-01') T2 ON T2.CSU_NIU = T1.CSU_NIU
 WHERE T1.CSU_PERIODO_OP=DATE'2019-01-01'
+ORDER BY 2 DESC
 ;
 
 SELECT * FROM QA_TCSU
