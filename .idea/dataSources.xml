@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="BRAE_PRODUCTION" uuid="d2cb6d73-d043-4f8c-91ef-81760b0f780a">
+    <data-source source="LOCAL" name="PRODUCTION_BRAE" uuid="01fbc803-360b-446f-a85a-a7c28502b5a0">
       <driver-ref>oracle.19</driver-ref>
       <synchronize>true</synchronize>
-      <remarks>PRODUCTION</remarks>
       <auto-commit>false</auto-commit>
       <jdbc-driver>oracle.jdbc.OracleDriver</jdbc-driver>
       <jdbc-url>jdbc:oracle:thin:@10.42.10.13:1521:SPARD</jdbc-url>
