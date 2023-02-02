@@ -21,6 +21,13 @@ BEGIN
             COMMIT
             ;
 
+            --ELIMINAR LOS USURIOS DE TIPO CONEXION P
+            DELETE FROM QA_TTC1_TEMP
+            WHERE TC1_TIPCONEX =  'P'
+            ;
+            COMMIT
+            ;
+
             --ELIMINAR LAS CALPs CONTENIDAS ACTAULAMENTE EN EL ARCHIVO,
             -- POSTERIORMENTE AGREGADO POR PROCEDIMIENTO QA_PTRANSFOR
             DELETE FROM QA_TTC1_TEMP
