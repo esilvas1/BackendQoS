@@ -71,18 +71,17 @@ BEGIN
                                         AND   TC1_TC1 NOT LIKE 'CALP%' 
                                         AND   TC1_CODCONEX NOT LIKE 'ALPM%' 
                                         AND   TC1_TIPCONEX = 'T'
-                                        AND   TC1_IDCOMER='604'
+                                        AND   TC1_IDCOMER = '604'
                                 MINUS
                                     SELECT DISTINCT TC1_TC1
                                     FROM  QA_TTC1_TEMP
                                     WHERE     TC1_TC1 NOT LIKE 'CALP%'
                                         AND   TC1_CODCONEX NOT LIKE 'ALPM%'
                                         AND   TC1_TIPCONEX = 'T'
-                                        AND   TC1_IDCOMER='604'
+                                        AND   TC1_IDCOMER = '604'
                               )
             AND TC1_PERIODO = MAX_PERIODO_TC1;
             COMMIT;
-            DBMS_OUTPUT.PUT_LINE('SUCESSFUL EJECUTION ONE'); 
 
             --CAMBIAR VALORES DE TIPO_CONEXION (1,2) A (T,P)
             UPDATE QA_TTC1_TEMP
@@ -94,7 +93,8 @@ BEGIN
             SET TC1_TIPCONEX = 'T'
             WHERE TC1_TIPCONEX = '2';
             COMMIT;
-            DBMS_OUTPUT.PUT_LINE('SUCESSFUL EJECUTION TWO'); 
+
+            DBMS_OUTPUT.PUT_LINE('SUCESSFUL EJECUTION');
             DBMS_OUTPUT.PUT_LINE('PLEASE EXECUTE THE PROCEDURE QA_PTT2_REGISTRO()'); 
     
     ELSE 
