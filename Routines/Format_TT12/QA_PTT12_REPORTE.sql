@@ -135,52 +135,59 @@ BEGIN
 
         UNION ALL
         
-        SELECT ID AS TT3_ID
-              ,TT1_NOMBRECIRCUITO
-              ,CIRCUITO
-              ,ACTIVIDAD
-              ,CIRCUITO
-              ,SUM(NUM_USRS) AS NUM_USRS
-              ,FINICIAL AS FINICIAL
-              ,FFINAL AS FFINAL
-              ,DURACION
-              ,MES_EJECUCION
-                FROM(
-                    SELECT T2.TT12_ID AS ID
-                          ,T1.TT1_NOMBRECIRCUITO
-                          ,T.TC1_CODCIRC AS CIRCUITO
-                          ,T2.TT12_ACTIVIDAD AS ACTIVIDAD
-                          --, FDD_IUA AS CODIGO_CIR_TRA
-                          , T.CANT_USRS AS NUM_USRS      
-                          , TO_DATE(TO_CHAR(FDD_FINICIAL,'DD/MM/YYYY HH24:MI:SS'),'DD/MM/YYYY HH24:MI:SS') AS FINICIAL
-                          , TO_DATE(TO_CHAR(FDD_FFINAL  ,'DD/MM/YYYY HH24:MI:SS'),'DD/MM/YYYY HH24:MI:SS') AS FFINAL
-                          , ROUND((TO_DATE(TO_CHAR(FDD_FFINAL  ,'DD/MM/YYYY HH24:MI:SS'),'DD/MM/YYYY HH24:MI:SS')
-                          - TO_DATE(TO_CHAR(FDD_FINICIAL,'DD/MM/YYYY HH24:MI:SS'),'DD/MM/YYYY HH24:MI:SS'))*24,2) AS DURACION
-                          ,TO_CHAR(FECHAOPERACION,'MM') AS MES_EJECUCION
-                    FROM QA_TFDDREGISTRO R
-                    LEFT OUTER JOIN (
-                                    SELECT DISTINCT 
-                                           TC1_CODCONEX
-                                          ,TC1_CODCIRC
-                                          ,COUNT(TC1_CODCONEX) AS CANT_USRS
-                                    FROM QA_TTC1
-                                    WHERE TC1_PERIODO = TO_CHAR(FECHAOPERACION,'YYYYMM')
-                                    AND   TC1_TIPCONEX =  'T'
-                                    AND   TC1_CODCONEX NOT LIKE 'ALPM%'
-                                    GROUP BY TC1_CODCONEX
-                                            ,TC1_CODCIRC
-                                     ) T ON T.TC1_CODCONEX = R.FDD_CODIGOELEMENTO 
-                    LEFT OUTER JOIN QA_TTT1_REGISTRO T1 ON T1.TT1_CODIGOCIRCUITO = T.TC1_CODCIRC
-                    LEFT OUTER JOIN (SELECT DISTINCT TT12_CODIGOEVENTO,TT12_ID, TT12_ACTIVIDAD FROM QA_TTT12_TEMP) T2 ON T2.TT12_CODIGOEVENTO = R.FDD_CODIGOEVENTO
-                    WHERE TO_CHAR(FDD_FINICIAL,'MM/YYYY') = TO_CHAR(FECHAOPERACION,'MM/YYYY')
-                    AND FDD_CAUSA_SSPD IN ('14')
-                )
-                GROUP BY ID,TT1_NOMBRECIRCUITO, CIRCUITO, FINICIAL, FFINAL, DURACION,MES_EJECUCION,1
+                SELECT ID AS TT3_ID
+                      ,TT1_NOMBRECIRCUITO
+                      ,CIRCUITO AS CIRC1
+                      ,ACTIVIDAD
+                      ,CIRCUITO AS CIRC2
+                      ,SUM(NUM_USRS) AS NUM_USRS
+                      ,FINICIAL AS FINICIAL
+                      ,FFINAL AS FFINAL
+                      ,DURACION
+                      ,MES_EJECUCION
+                        FROM(
+                            SELECT T2.TT12_ID AS ID
+                                  ,T1.TT1_NOMBRECIRCUITO
+                                  ,T.TC1_CODCIRC AS CIRCUITO
+                                  ,T2.TT12_ACTIVIDAD AS ACTIVIDAD
+                                  --, FDD_IUA AS CODIGO_CIR_TRA
+                                  , T.CANT_USRS AS NUM_USRS
+                                  , TO_DATE(TO_CHAR(FDD_FINICIAL,'DD/MM/YYYY HH24:MI:SS'),'DD/MM/YYYY HH24:MI:SS') AS FINICIAL
+                                  , TO_DATE(TO_CHAR(FDD_FFINAL  ,'DD/MM/YYYY HH24:MI:SS'),'DD/MM/YYYY HH24:MI:SS') AS FFINAL
+                                  , ROUND((TO_DATE(TO_CHAR(FDD_FFINAL  ,'DD/MM/YYYY HH24:MI:SS'),'DD/MM/YYYY HH24:MI:SS')
+                                  - TO_DATE(TO_CHAR(FDD_FINICIAL,'DD/MM/YYYY HH24:MI:SS'),'DD/MM/YYYY HH24:MI:SS'))*24,2) AS DURACION
+                                  ,TO_CHAR(FECHAOPERACION,'MM') AS MES_EJECUCION
+                            FROM QA_TFDDREGISTRO R
+                            LEFT OUTER JOIN (
+                                            SELECT DISTINCT
+                                                   TC1_CODCONEX
+                                                  ,TC1_CODCIRC
+                                                  ,COUNT(TC1_CODCONEX) AS CANT_USRS
+                                            FROM QA_TTC1
+                                            WHERE TC1_PERIODO = TO_CHAR(FECHAOPERACION,'YYYYMM')
+                                            AND   TC1_TIPCONEX =  'T'
+                                            AND   TC1_CODCONEX NOT LIKE 'ALPM%'
+                                            GROUP BY TC1_CODCONEX
+                                                    ,TC1_CODCIRC
+                                             ) T ON T.TC1_CODCONEX = R.FDD_CODIGOELEMENTO
+                            LEFT OUTER JOIN QA_TTT1_REGISTRO T1 ON T1.TT1_CODIGOCIRCUITO = T.TC1_CODCIRC
+                            LEFT OUTER JOIN (SELECT DISTINCT TT12_CODIGOEVENTO,TT12_ID, TT12_ACTIVIDAD FROM QA_TTT12_TEMP) T2 ON T2.TT12_CODIGOEVENTO = R.FDD_CODIGOEVENTO
+                            WHERE TO_CHAR(FDD_FINICIAL,'MM/YYYY') = TO_CHAR(FECHAOPERACION,'MM/YYYY')
+                            AND FDD_CAUSA_SSPD IN ('14')
+                            )
+                         GROUP BY ID
+                                ,TT1_NOMBRECIRCUITO
+                                ,CIRCUITO
+                                ,FINICIAL
+                                ,FFINAL
+                                ,DURACION
+                                ,MES_EJECUCION
+                                ,ACTIVIDAD
                 ) ;
             COMMIT;
             
             --BORRAR TABLA QA_TTT12_TEMP;
-            DELETE FROM QA_TTT12_TEMP;
+            DELETE FROM QA_TTT12_TEMP WHERE ROWNUM >= 0;
             COMMIT;
 
             --Marcar las actividades ejecutadas en QA_TTT3_REGISTRO
