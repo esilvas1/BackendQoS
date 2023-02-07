@@ -42,7 +42,7 @@ BEGIN
             SET 
                 TC1_CODCONEX =  TC1_CODTRANSF
                ,TC1_TIPCONEX = 'T'--Solucionar a futuro que no cambie los tipo P
-            ;
+            WHERE ROWNUM >= 0;
             COMMIT
             ;
             
@@ -60,28 +60,6 @@ BEGIN
             COMMIT
             ;
 
-            --AGREGAMOS ESTOS USUARIOS DIRECTAMENTE DEL TC1 ANTERIOR(t-1) DEBIDO A UN ERROR EN LA DESCARGA SAC
-            --*Alzate se pondra en contacto con los desarrolladores de SAC a traves de mesa de ayuda para solucionar este inconveniente
-
-            INSERT INTO QA_TTC1_TEMP
-            SELECT * FROM QA_TTC1
-            WHERE TC1_TC1 IN (      SELECT DISTINCT TC1_TC1 
-                                    FROM  QA_TTC1 
-                                    WHERE     TC1_PERIODO = MAX_PERIODO_TC1
-                                        AND   TC1_TC1 NOT LIKE 'CALP%' 
-                                        AND   TC1_CODCONEX NOT LIKE 'ALPM%' 
-                                        AND   TC1_TIPCONEX = 'T'
-                                        AND   TC1_IDCOMER = '604'
-                                MINUS
-                                    SELECT DISTINCT TC1_TC1
-                                    FROM  QA_TTC1_TEMP
-                                    WHERE     TC1_TC1 NOT LIKE 'CALP%'
-                                        AND   TC1_CODCONEX NOT LIKE 'ALPM%'
-                                        AND   TC1_TIPCONEX = 'T'
-                                        AND   TC1_IDCOMER = '604'
-                              )
-            AND TC1_PERIODO = MAX_PERIODO_TC1;
-            COMMIT;
 
             --CAMBIAR VALORES DE TIPO_CONEXION (1,2) A (T,P)
             UPDATE QA_TTC1_TEMP
