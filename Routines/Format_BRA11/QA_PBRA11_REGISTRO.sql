@@ -76,6 +76,6 @@ BEGIN
     
 END QA_PBRA11_REGISTRO;
 
-
-    --ENVIAR CORREO CON ACTIVOS NR A ANGEL
     --sincronizando los provisonales de los planeados
+    --solucionar el campo ESTADO de la tabla QA_TBRA11_REGISTRO
+    --validar y/o comparar TT2 y BRA11
