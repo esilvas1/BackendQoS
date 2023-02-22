@@ -65,7 +65,7 @@ BEGIN
         WHERE BRA11_CODIGOELEMENTO IN (
                                        SELECT DISTINCT BRA11_CODIGOELEMENTO
                                        FROM BRAE.QA_TBRA11_REGISTRO
-                                       WHERE BRA11_PERIODO_OP = DATE'2022-12-01'-- TRUNC(FECHAOPERACION)
+                                       WHERE BRA11_PERIODO_OP = TRUNC(FECHAOPERACION)
                                        )
         AND   BRA11_PERIODO_OP <> TRUNC(FECHAOPERACION)
         AND   BRA11_ESTADO = '2';
@@ -76,5 +76,6 @@ BEGIN
     
 END QA_PBRA11_REGISTRO;
 
-    --CUANDO SE HAGA UNA RESPOSICION MANTENER LA MARCA DE REGISTRO NR
+
     --ENVIAR CORREO CON ACTIVOS NR A ANGEL
+    --sincronizando los provisonales de los planeados
