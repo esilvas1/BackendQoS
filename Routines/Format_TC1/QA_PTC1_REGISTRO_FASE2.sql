@@ -312,7 +312,7 @@ BEGIN
 
             --CORREGIR ALGUNOS CARACTERES EN EL CAMPO DIRRECION
             UPDATE QA_TTC1_TEMP
-            SET TC1_DIREC = SUBSTR(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(TC1_DIREC,'�?','A'),'É','E'),'�?','I'),'Ó','O'),'Ú','U'),'á','a'),'é','e'),'í','i'),'ó','o'),'ú','u'),'Ñ','N'),'(',' '),')',' '),'\',' '),'/',' '),',',' '),'.',' '),'°',' '),'À',' '),'1º',' '),'2°',' '),'3°',' '),'º',' '),'·',' '),'ñ','n'),'´',' '),' ',' '),'#',' '),'ª',' '),'Ò',' '),'¿',''),'Â¿',''),'Â',''),1,50)
+            SET TC1_DIREC = SUBSTR(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(TC1_DIREC,'�?','A'),'É','E'),'�?','I'),'Ó','O'),'Ú','U'),'á','a'),'é','e'),'í','i'),'ó','o'),'ú','u'),'Ñ','N'),'(',' '),')',' '),'\',' '),'/',' '),',',' '),'.',' '),'°',' '),'À',' '),'1º',' '),'2°',' '),'3°',' '),'º',' '),'·',' '),'ñ','n'),'´',' '),' ',' '),'#',' '),'ª',' '),'Ò',' '),'¿',''),'Â¿',''),'Â',''),1,50)
             ;
             COMMIT;
 
@@ -353,6 +353,7 @@ BEGIN
             
             --PASAR LA INFORMACION DE QA_TTC1_TEMP A QA_TTC1
             --DAR LUZ VERDE AL FORMATO DE AJUSTE Y EL PRIMER FORMATO DIARIO DEL PERIODO (t+1)
+            --AGREGAR USUARIOS A LOS CODIGOS NUEVOS IUL
            
             /*************************************** P R O C E D I M I E N T O - P A R A - E L - R E G I S T R O - D I A R I O - L A C ***********************************************/        
             -->GENERACION DE LOS DATOS DE LA TABLA DE REFERENCIA LAC
