@@ -174,7 +174,87 @@ BEGIN
         
        --CARGAR DATOS DE TRANSFERENCIA DE GTECH A BRAE 
        --V_QA_TTT2_REGISTRO.DELETE;
+         WITH INFO_AP AS
+        (SELECT  SUBSTR(CON.NODO_TRANSFORM_V,1,20) AS NODO_TRANSFORM_V,SUM(LUM.POTENCIA) AS POTENCIA_INSTALADA
+         FROM CCONECTIVIDAD_E@GTECH CON
+         JOIN CCOMUN@GTECH COM ON CON.G3E_FID=COM.G3E_FID
+         JOIN ELUMINAR_AT@GTECH LUM ON  LUM.G3E_FID = CON.G3E_FID
+         WHERE CON.G3E_FNO = 21400
+         GROUP BY CON.NODO_TRANSFORM_V)
 
+        SELECT SUBSTR(CON.NODO_TRANSFORM_V,1,20)          AS TT2_CODIGOELEMENTO
+            ,NULL                                         AS TT2_CODE_IUA --GESTIONADO POR PROCEDIMIENTO
+            ,SUBSTR(COM.GRUPO_CALIDAD,1,2)                AS TT2_GRUPOCALIDAD
+            ,SUBSTR(COM.ID_MERCADO,1,20)                  AS TT2_IDMERCADO
+            ,TO_NUMBER(CON.CAPACIDAD_NOMINAL)             AS TT2_CAPACIDAD_TRAFO
+            ,SUBSTR(CPRO.PROPIETARIO_1,1,20)              AS TT2_PROPIEDAD
+            ,TO_NUMBER(ET.TIPO_SUBESTACION)               AS TT2_TSUBESTACION
+            ,REPLACE(TRIM(COM.COOR_GPS_LON),',','.')      AS TT2_LONGITUD
+            ,REPLACE(TRIM(COM.COOR_GPS_LAT),',','.')      AS TT2_LATITUD
+            ,TO_NUMBER(COM.COOR_Z)                        AS TT2_ALTITUD
+            ,COM.ESTADO                                   AS TT2_ESTADO
+            ,(CASE WHEN(ET.PROVISIONAL = 'SI')
+                   THEN('PLANEACION'         )
+                   ELSE(COM.ESTADO           )
+              END)                                        AS TT2_ESTADO_BRA11
+            ,'015-2018'                                   AS TT2_RESMETODOLOGIA
+            ,NULL                                         AS TT2_CLASS_CARGA --GESTIONADO POR PROCEDIMIENTO
+            ,SUBSTR(CON.CIRCUITO,1,20)                    AS TT2_NOMBRE_CIRCUITO
+            ,SUBSTR(TT1.TT1_CODIGOCIRCUITO,1,5)           AS TT2_IUL
+            ,NULL                                         AS TT2_CODIGOPROYECTO --INDEFINIDO
+            ,NULL                                         AS TT2_UNIDAD_CONSTRUCTIVA
+            ,DECODE(CPRO.PROPIETARIO_1,'ESTADO',1,0)      AS TT2_RPP
+            ,DECODE(COM.SALINIDAD, 'SI', '1', '2')        AS TT2_SALINIDAD
+            ,(CASE WHEN (COM.TIPO_PROYECTO = 'T4')
+                   THEN ('T4'                    )
+                   ELSE (NULL                    )
+              END)                                        AS TT2_TIPOINVERSION -- CONFIGURADO POR PROCEDIMIENTO
+            ,2                                            AS TT2_REMUNERACION_PENDIENTE
+            ,DECODE
+              (DECODE(ET.PROVISIONAL,'SI','PLANEACION',COM.ESTADO)
+                       ,'PLANEACION','INVA'
+                       ,'OPERACION','BRAEN'
+                       ,'RETIRADO','BRAFO'
+               )                                          AS TT2_ALTERNATIVA_VALORACION
+            ,NULL                                         AS TT2_ID_PLAN
+            ,0                                            AS TT2_CANTIDAD_REPOSICIONES --GESTIONADO POR PROCEDIMIENTO
+            ,COM.FECHA_OPERACION                          AS TT2_FESTADO --FECHA MANUAL DE OPERACION DEL ACTIVO
+            ,COM.FECHA_COLOCACION                         AS TT2_FCOLOCACION -- FECHA SISTEMA DE CREACION DE ACTIVO
+            ,COM.FECHA_MODIFICACION                       AS TT2_FMODIFICACION --FECHA SISTEMA DE MODIFICACION DE ACTIVO
+            ,COM.USUARIO_COLOCACION                       AS TT2_USR_COLOCACION --PERS
+            ,COM.USUARIO_MODIFICACION                     AS TT2_USR_MODFICACION
+            ,TRUNC(FECHAOPERACION)                        AS TT2_PERIODO_OP
+            ,0                                            AS TT2_ESTADOREPORTE
+            ,SYSDATE                                      AS TT2_FSISTEMA
+            ,0                                            AS TT2_ACTIVOCONEXION --PENDIENTE TRAER DEL SISTEMA GTECH
+            ,(CASE WHEN ET.PROVISIONAL='SI'
+                   THEN 1
+                   ELSE 0
+              END)                                        AS TT2_ACTIVOPROVISIONAL --PENDIENTE TRAER DEL SISTEMA
+            ,NVL(AP.POTENCIA_INSTALADA,0)                 AS TT2_AP_POTENCIA
+            ,0                                            AS TT2_CODE_CALP
+            ,CON.FASES                                    AS TT2_FASES
+            ,COM.CLASIFICACION_MERCADO                    AS TT2_POBLACION
+            ,NULL                                         AS TT2_VALOR_UC
+            ,NULL                                         AS TT2_OBSERVACIONES
+            ,CON.LOCALIZACION                             AS TT2_LOCALIZACION
+            ,COM.MUNICIPIO                                AS TT2_MUNICIPIO
+            ,COM.DEPARTAMENTO                             AS TT2_DEPARTAMENTO
+            ,/*TO_NUMBER(CON.TENSION)*/ 0                      AS TT2_NT_PRIMARIA
+            ,/*TO_NUMBER(CON.TENSION_SECUNDARIA)*/ 0            AS TT2_NT_SECUNDARIA
+            ,0                                            AS TT2_ACTIVONR
+            ,COM.G3E_FID                                  AS TT2_G3E_FID
+            ,COM.FID_ANTERIOR                             AS TT2_FID_ANTERIOR
+        BULK COLLECT INTO   V_QA_TTT2_REGISTRO
+        FROM                CCONECTIVIDAD_E@GTECH  CON
+            LEFT OUTER JOIN CCOMUN@GTECH           COM  ON  COM.G3E_FID            = CON.G3E_FID
+            LEFT OUTER JOIN ETRANSFO_AT@GTECH      ET   ON  ET.G3E_FID             = COM.G3E_FID
+            LEFT OUTER JOIN CPROPIETARIO@GTECH     CPRO ON  CPRO.G3E_FID           = CON.G3E_FID
+            LEFT OUTER JOIN QA_TTT1_REGISTRO       TT1  ON  TT1.TT1_NOMBRECIRCUITO = CON.CIRCUITO
+            LEFT OUTER JOIN INFO_AP                AP   ON AP.NODO_TRANSFORM_V     = SUBSTR(CON.NODO_TRANSFORM_V,1,20)
+        WHERE               COM.G3E_FNO = 20400
+        AND                 COM.ESTADO <> 'CONSTRUCCION'
+        ;
 
         IF V_QA_TTT2_REGISTRO IS NOT EMPTY THEN
              FOR i IN V_QA_TTT2_REGISTRO.FIRST..V_QA_TTT2_REGISTRO.LAST LOOP
@@ -1028,85 +1108,6 @@ BEGIN
   END IF; --IF DE INHABILITACION EN REGISTRAR INFORMACION REPORTADA
 ---FINALIZACION DEL PROECIEMIENTRO QA_PTT2()
 END QA_PTT2_REGISTRO;
-WITH INFO_AP AS
-         (SELECT  SUBSTR(CON.NODO_TRANSFORM_V,1,20) AS NODO_TRANSFORM_V,SUM(LUM.POTENCIA) AS POTENCIA_INSTALADA
-          FROM CCONECTIVIDAD_E@GTECH CON
-                   JOIN CCOMUN@GTECH COM ON CON.G3E_FID=COM.G3E_FID
-                   JOIN ELUMINAR_AT@GTECH LUM ON  LUM.G3E_FID = CON.G3E_FID
-          WHERE CON.G3E_FNO = 21400
-          GROUP BY CON.NODO_TRANSFORM_V)
-
-SELECT SUBSTR(CON.NODO_TRANSFORM_V,1,20)          AS TT2_CODIGOELEMENTO
-     ,NULL                                         AS TT2_CODE_IUA --GESTIONADO POR PROCEDIMIENTO
-     ,SUBSTR(COM.GRUPO_CALIDAD,1,2)                AS TT2_GRUPOCALIDAD
-     ,SUBSTR(COM.ID_MERCADO,1,20)                  AS TT2_IDMERCADO
-     ,TO_NUMBER(CON.CAPACIDAD_NOMINAL)             AS TT2_CAPACIDAD_TRAFO
-     ,SUBSTR(CPRO.PROPIETARIO_1,1,20)              AS TT2_PROPIEDAD
-     ,TO_NUMBER(ET.TIPO_SUBESTACION)               AS TT2_TSUBESTACION
-     ,REPLACE(TRIM(COM.COOR_GPS_LON),',','.')      AS TT2_LONGITUD
-     ,REPLACE(TRIM(COM.COOR_GPS_LAT),',','.')      AS TT2_LATITUD
-     ,TO_NUMBER(COM.COOR_Z)                        AS TT2_ALTITUD
-     ,COM.ESTADO                                   AS TT2_ESTADO
-     ,(CASE WHEN(ET.PROVISIONAL = 'SI')
-                THEN('PLANEACION'         )
-            ELSE(COM.ESTADO           )
-    END)                                        AS TT2_ESTADO_BRA11
-     ,'015-2018'                                   AS TT2_RESMETODOLOGIA
-     ,NULL                                         AS TT2_CLASS_CARGA --GESTIONADO POR PROCEDIMIENTO
-     ,SUBSTR(CON.CIRCUITO,1,20)                    AS TT2_NOMBRE_CIRCUITO
-     ,SUBSTR(TT1.TT1_CODIGOCIRCUITO,1,5)           AS TT2_IUL
-     ,NULL                                         AS TT2_CODIGOPROYECTO --INDEFINIDO
-     ,NULL                                         AS TT2_UNIDAD_CONSTRUCTIVA
-     ,DECODE(CPRO.PROPIETARIO_1,'ESTADO',1,0)      AS TT2_RPP
-     ,DECODE(COM.SALINIDAD, 'SI', '1', '2')        AS TT2_SALINIDAD
-     ,(CASE WHEN (COM.TIPO_PROYECTO = 'T4')
-                THEN ('T4'                    )
-            ELSE (NULL                    )
-    END)                                        AS TT2_TIPOINVERSION -- CONFIGURADO POR PROCEDIMIENTO
-     ,2                                            AS TT2_REMUNERACION_PENDIENTE
-     ,DECODE
-    (DECODE(ET.PROVISIONAL,'SI','PLANEACION',COM.ESTADO)
-    ,'PLANEACION','INVA'
-    ,'OPERACION','BRAEN'
-    ,'RETIRADO','BRAFO'
-    )                                          AS TT2_ALTERNATIVA_VALORACION
-     ,NULL                                         AS TT2_ID_PLAN
-     ,0                                            AS TT2_CANTIDAD_REPOSICIONES --GESTIONADO POR PROCEDIMIENTO
-     ,COM.FECHA_OPERACION                          AS TT2_FESTADO --FECHA MANUAL DE OPERACION DEL ACTIVO
-     ,COM.FECHA_COLOCACION                         AS TT2_FCOLOCACION -- FECHA SISTEMA DE CREACION DE ACTIVO
-     ,COM.FECHA_MODIFICACION                       AS TT2_FMODIFICACION --FECHA SISTEMA DE MODIFICACION DE ACTIVO
-     ,COM.USUARIO_COLOCACION                       AS TT2_USR_COLOCACION --PERS
-     ,COM.USUARIO_MODIFICACION                     AS TT2_USR_MODFICACION
-     ,TRUNC(FECHAOPERACION)                        AS TT2_PERIODO_OP
-     ,0                                            AS TT2_ESTADOREPORTE
-     ,SYSDATE                                      AS TT2_FSISTEMA
-     ,0                                            AS TT2_ACTIVOCONEXION --PENDIENTE TRAER DEL SISTEMA GTECH
-     ,(CASE WHEN ET.PROVISIONAL='SI'
-                THEN 1
-            ELSE 0
-    END)                                        AS TT2_ACTIVOPROVISIONAL --PENDIENTE TRAER DEL SISTEMA
-     ,NVL(AP.POTENCIA_INSTALADA,0)                 AS TT2_AP_POTENCIA
-     ,0                                            AS TT2_CODE_CALP
-     ,CON.FASES                                    AS TT2_FASES
-     ,COM.CLASIFICACION_MERCADO                    AS TT2_POBLACION
-     ,NULL                                         AS TT2_VALOR_UC
-     ,NULL                                         AS TT2_OBSERVACIONES
-     ,CON.LOCALIZACION                             AS TT2_LOCALIZACION
-     ,COM.MUNICIPIO                                AS TT2_MUNICIPIO
-     ,COM.DEPARTAMENTO                             AS TT2_DEPARTAMENTO
-     ,/*TO_NUMBER(CON.TENSION)*/ 0                      AS TT2_NT_PRIMARIA
-     ,/*TO_NUMBER(CON.TENSION_SECUNDARIA)*/ 0            AS TT2_NT_SECUNDARIA
-     ,0                                            AS TT2_ACTIVONR
-        BULK COLLECT INTO   V_QA_TTT2_REGISTRO
-FROM                CCONECTIVIDAD_E@GTECH  CON
-                        LEFT OUTER JOIN CCOMUN@GTECH           COM  ON  COM.G3E_FID            = CON.G3E_FID
-                        LEFT OUTER JOIN ETRANSFO_AT@GTECH      ET   ON  ET.G3E_FID             = COM.G3E_FID
-                        LEFT OUTER JOIN CPROPIETARIO@GTECH     CPRO ON  CPRO.G3E_FID           = CON.G3E_FID
-                        LEFT OUTER JOIN QA_TTT1_REGISTRO       TT1  ON  TT1.TT1_NOMBRECIRCUITO = CON.CIRCUITO
-                        LEFT OUTER JOIN INFO_AP                AP   ON AP.NODO_TRANSFORM_V     = SUBSTR(CON.NODO_TRANSFORM_V,1,20)
-WHERE               COM.G3E_FNO = 20400
-  AND                 COM.ESTADO <> 'CONSTRUCCION'
-;
 
 -->IF (COM.G3E_FID <> COM.FID_ANTERIOR) THEN 'REPOSICION' ELSE 'REPARADO' END IF : GESTIONAR ESTE PROCESO PARA LOS REGISTROS DE REPOSICION
 -->PESTAÑA IDENTIFICACION, CAMPO : USO --> ALIMENTADOR CONTROL RECONECTADOR
