@@ -170,108 +170,28 @@ BEGIN
         DELETE FROM QA_TTT2_OBS
         WHERE ROWNUM >= 0;
         COMMIT;
-        
- 
+
         
        --CARGAR DATOS DE TRANSFERENCIA DE GTECH A BRAE 
        --V_QA_TTT2_REGISTRO.DELETE;
-        WITH INFO_AP AS 
-        (SELECT  SUBSTR(CON.NODO_TRANSFORM_V,1,20) AS NODO_TRANSFORM_V,SUM(LUM.POTENCIA) AS POTENCIA_INSTALADA
-         FROM CCONECTIVIDAD_E@GTECH CON
-         JOIN CCOMUN@GTECH COM ON CON.G3E_FID=COM.G3E_FID
-         JOIN ELUMINAR_AT@GTECH LUM ON  LUM.G3E_FID = CON.G3E_FID
-         WHERE CON.G3E_FNO = 21400
-         GROUP BY CON.NODO_TRANSFORM_V)
-            
-        SELECT SUBSTR(CON.NODO_TRANSFORM_V,1,20)          AS TT2_CODIGOELEMENTO
-            ,NULL                                         AS TT2_CODE_IUA --GESTIONADO POR PROCEDIMIENTO
-            ,SUBSTR(COM.GRUPO_CALIDAD,1,2)                AS TT2_GRUPOCALIDAD
-            ,SUBSTR(COM.ID_MERCADO,1,20)                  AS TT2_IDMERCADO
-            ,TO_NUMBER(CON.CAPACIDAD_NOMINAL)             AS TT2_CAPACIDAD_TRAFO
-            ,SUBSTR(CPRO.PROPIETARIO_1,1,20)              AS TT2_PROPIEDAD
-            ,TO_NUMBER(ET.TIPO_SUBESTACION)               AS TT2_TSUBESTACION
-            ,REPLACE(TRIM(COM.COOR_GPS_LON),',','.')      AS TT2_LONGITUD
-            ,REPLACE(TRIM(COM.COOR_GPS_LAT),',','.')      AS TT2_LATITUD
-            ,TO_NUMBER(COM.COOR_Z)                        AS TT2_ALTITUD
-            ,COM.ESTADO                                   AS TT2_ESTADO
-            ,(CASE WHEN(ET.PROVISIONAL = 'SI') 
-                   THEN('PLANEACION'         ) 
-                   ELSE(COM.ESTADO           ) 
-              END)                                        AS TT2_ESTADO_BRA11
-            ,'015-2018'                                   AS TT2_RESMETODOLOGIA
-            ,NULL                                         AS TT2_CLASS_CARGA --GESTIONADO POR PROCEDIMIENTO
-            ,SUBSTR(CON.CIRCUITO,1,20)                    AS TT2_NOMBRE_CIRCUITO
-            ,SUBSTR(TT1.TT1_CODIGOCIRCUITO,1,5)           AS TT2_IUL
-            ,NULL                                         AS TT2_CODIGOPROYECTO --INDEFINIDO
-            ,NULL                                         AS TT2_UNIDAD_CONSTRUCTIVA
-            ,DECODE(CPRO.PROPIETARIO_1,'ESTADO',1,0)      AS TT2_RPP
-            ,DECODE(COM.SALINIDAD, 'SI', '1', '2')        AS TT2_SALINIDAD
-            ,(CASE WHEN (COM.TIPO_PROYECTO = 'T4')
-                   THEN ('T4'                    )
-                   ELSE (NULL                    ) 
-              END)                                        AS TT2_TIPOINVERSION -- CONFIGURADO POR PROCEDIMIENTO
-            ,2                                            AS TT2_REMUNERACION_PENDIENTE 
-            ,DECODE
-              (DECODE(ET.PROVISIONAL,'SI','PLANEACION',COM.ESTADO)
-                       ,'PLANEACION','INVA'
-                       ,'OPERACION','BRAEN'
-                       ,'RETIRADO','BRAFO'
-               )                                          AS TT2_ALTERNATIVA_VALORACION 
-            ,NULL                                         AS TT2_ID_PLAN
-            ,0                                            AS TT2_CANTIDAD_REPOSICIONES --GESTIONADO POR PROCEDIMIENTO
-            ,COM.FECHA_OPERACION                          AS TT2_FESTADO --FECHA MANUAL DE OPERACION DEL ACTIVO
-            ,COM.FECHA_COLOCACION                         AS TT2_FCOLOCACION -- FECHA SISTEMA DE CREACION DE ACTIVO
-            ,COM.FECHA_MODIFICACION                       AS TT2_FMODIFICACION --FECHA SISTEMA DE MODIFICACION DE ACTIVO
-            ,COM.USUARIO_COLOCACION                       AS TT2_USR_COLOCACION --PERS
-            ,COM.USUARIO_MODIFICACION                     AS TT2_USR_MODFICACION
-            ,TRUNC(FECHAOPERACION)                        AS TT2_PERIODO_OP
-            ,0                                            AS TT2_ESTADOREPORTE
-            ,SYSDATE                                      AS TT2_FSISTEMA
-            ,0                                            AS TT2_ACTIVOCONEXION --PENDIENTE TRAER DEL SISTEMA GTECH
-            ,(CASE WHEN ET.PROVISIONAL='SI'
-                   THEN 1 
-                   ELSE 0 
-              END)                                        AS TT2_ACTIVOPROVISIONAL --PENDIENTE TRAER DEL SISTEMA
-            ,NVL(AP.POTENCIA_INSTALADA,0)                 AS TT2_AP_POTENCIA
-            ,0                                            AS TT2_CODE_CALP
-            ,CON.FASES                                    AS TT2_FASES
-            ,COM.CLASIFICACION_MERCADO                    AS TT2_POBLACION
-            ,NULL                                         AS TT2_VALOR_UC
-            ,NULL                                         AS TT2_OBSERVACIONES
-            ,CON.LOCALIZACION                             AS TT2_LOCALIZACION
-            ,COM.MUNICIPIO                                AS TT2_MUNICIPIO
-            ,COM.DEPARTAMENTO                             AS TT2_DEPARTAMENTO
-            ,/*TO_NUMBER(CON.TENSION)*/ 0                      AS TT2_NT_PRIMARIA
-            ,/*TO_NUMBER(CON.TENSION_SECUNDARIA)*/ 0            AS TT2_NT_SECUNDARIA
-            ,0                                            AS TT2_ACTIVONR
-        BULK COLLECT INTO   V_QA_TTT2_REGISTRO
-        FROM                CCONECTIVIDAD_E@GTECH  CON
-            LEFT OUTER JOIN CCOMUN@GTECH           COM  ON  COM.G3E_FID            = CON.G3E_FID
-            LEFT OUTER JOIN ETRANSFO_AT@GTECH      ET   ON  ET.G3E_FID             = COM.G3E_FID
-            LEFT OUTER JOIN CPROPIETARIO@GTECH     CPRO ON  CPRO.G3E_FID           = CON.G3E_FID
-            LEFT OUTER JOIN QA_TTT1_REGISTRO       TT1  ON  TT1.TT1_NOMBRECIRCUITO = CON.CIRCUITO
-            LEFT OUTER JOIN INFO_AP                AP   ON AP.NODO_TRANSFORM_V     = SUBSTR(CON.NODO_TRANSFORM_V,1,20)
-        WHERE               COM.G3E_FNO = 20400
-        AND                 COM.ESTADO <> 'CONSTRUCCION'
-        ;
-     
-    
-        
+
+
+
         IF V_QA_TTT2_REGISTRO IS NOT EMPTY THEN
              FOR i IN V_QA_TTT2_REGISTRO.FIRST..V_QA_TTT2_REGISTRO.LAST LOOP
-                   INSERT INTO BRAE.QA_TTT2_TEMP
+                     INSERT INTO BRAE.QA_TTT2_TEMP
                    VALUES V_QA_TTT2_REGISTRO(i);
-             END LOOP;
+                 END LOOP;
              COMMIT;
         END IF;
 
-      
+
   --EXPANSION
 
         --LOCALIZANDO E INSERTANDO LOS NUEVOS REGISTRO DE EXPANSION DE TRANSFORMADORES
         --CRUCE DE LAS TABLAS QA_TTT2_REGISTRO CON QA_TTT2_TEMP, PARA EXTAER LOS TRANSFORMADORES DE EXPANSION
         V_QA_TTT2_REGISTRO.DELETE;
-        SELECT * 
+        SELECT *
         BULK COLLECT INTO V_QA_TTT2_REGISTRO
         FROM QA_TTT2_TEMP
         WHERE TT2_CODIGOELEMENTO IN (
@@ -282,19 +202,19 @@ BEGIN
                                     SELECT TT2_CODIGOELEMENTO
                                     FROM QA_TTT2_REGISTRO
                                     )
-        AND NVL(TRUNC(TT2_FMODIFICACION),FECHAOPERACION) < 
-            TRUNC(ADD_MONTHS(FECHAOPERACION,1))                                    
+        AND NVL(TRUNC(TT2_FMODIFICACION),FECHAOPERACION) <
+            TRUNC(ADD_MONTHS(FECHAOPERACION,1))
         ;
-                                    
+
         IF V_QA_TTT2_REGISTRO IS NOT EMPTY THEN
              FOR i IN V_QA_TTT2_REGISTRO.FIRST..V_QA_TTT2_REGISTRO.LAST LOOP
                    INSERT INTO BRAE.QA_TTT2_REGISTRO
                    VALUES V_QA_TTT2_REGISTRO(i);
-                   
+
                    DELETE FROM QA_TTT2_TEMP
                    WHERE TT2_CODIGOELEMENTO = V_QA_TTT2_REGISTRO(i).TT2_CODIGOELEMENTO
                    AND   TT2_ESTADO = 'RETIRADO';--//ELIMINACION DE LOS REGISTROS NUEVOS CON REPOSICION, PARA EVITAR REPOSICIONES DE EXPANSIONES
-                   
+
              END LOOP;
              COMMIT;
         END IF;
@@ -302,15 +222,16 @@ BEGIN
         DELETE FROM QA_TTT2_REGISTRO
         WHERE  TT2_ESTADO = 'RETIRADO';--CHECK IF THIS SENTENCE IS FUNCTIONAL
         COMMIT;
-        
+
   --REVISAR Y EXCLUIR LOS TRANSOFORMADORES CON FECHA ESTADO DIFERENTE AL AÑO DE OPERACION, COLOCARLO EN LA TABLA QA_TTT2_OBS
         V_QA_TTT2_REGISTRO.DELETE;
-        SELECT * 
+        SELECT *
         BULK COLLECT INTO V_QA_TTT2_REGISTRO
         FROM QA_TTT2_REGISTRO
-        WHERE TO_NUMBER(TO_CHAR(TT2_FESTADO,'YYYY')) < TO_NUMBER(TO_CHAR(FECHAOPERACION,'YYYY'))
+        --WHERE TO_NUMBER(TO_CHAR(TT2_FESTADO,'YYYY')) < TO_NUMBER(TO_CHAR(FECHAOPERACION,'YYYY'))
+        WHERE TO_NUMBER(TO_CHAR(TT2_FESTADO,'YYYY')) not in ('2023','2022',2021)
         AND TT2_PERIODO_OP=TRUNC(FECHAOPERACION);
-        
+
 
         IF V_QA_TTT2_REGISTRO IS NOT EMPTY THEN
              FOR i IN V_QA_TTT2_REGISTRO.FIRST..V_QA_TTT2_REGISTRO.LAST LOOP
@@ -318,17 +239,17 @@ BEGIN
                    INSERT INTO BRAE.QA_TTT2_OBS
                    VALUES V_QA_TTT2_REGISTRO(i);
                    --EXCLUSION DE LA TABLA QA_TTT2_REGISTRO
-                   DELETE 
+                   DELETE
                    FROM QA_TTT2_REGISTRO
-                   WHERE TT2_CODIGOELEMENTO=V_QA_TTT2_REGISTRO(i).TT2_CODIGOELEMENTO;                   
+                   WHERE TT2_CODIGOELEMENTO=V_QA_TTT2_REGISTRO(i).TT2_CODIGOELEMENTO;
              END LOOP;
              COMMIT;
         END IF;
-        
+
   --VALIDACION DE CAMPOS NULLS Y COLOCACION EN TABLA QA_TTT2_OBS PARA LOS REGISTROS INSERTADOS POR EXAPANSION
         V_QA_TTT2_REGISTRO.DELETE;
 
-        SELECT * 
+        SELECT *
         BULK  COLLECT INTO V_QA_TTT2_REGISTRO
         FROM  QA_TTT2_REGISTRO
         WHERE TT2_PERIODO_OP = FECHAOPERACION
@@ -346,8 +267,8 @@ BEGIN
             OR	TT2_IUL	                IS NULL
             )
         AND TT2_CODE_IUA                IS NULL;
-        
-        --INCLUSION EN QA_TTT2_OBS            
+
+        --INCLUSION EN QA_TTT2_OBS
         IF V_QA_TTT2_REGISTRO IS NOT EMPTY THEN
               FOR i IN V_QA_TTT2_REGISTRO.FIRST..V_QA_TTT2_REGISTRO.LAST LOOP
                     --Inserta en tabla de observaciones
@@ -356,11 +277,11 @@ BEGIN
                     --Elimina de la tabla de registros
                     DELETE FROM BRAE.QA_TTT2_REGISTRO
                     WHERE  TT2_CODIGOELEMENTO = V_QA_TTT2_REGISTRO(i).TT2_CODIGOELEMENTO
-                    AND    TT2_CODE_IUA IS NULL;                    
+                    AND    TT2_CODE_IUA IS NULL;
               END LOOP;
               COMMIT;
          END IF;
-         
+
         --CONFIGURAR DE LOS NUEVOS REGISTROS DE EXPANSION EL CAMPO TIPO DE PROYECTO POR DEFECTO "2"
 
         UPDATE QA_TTT2_REGISTRO
@@ -368,47 +289,47 @@ BEGIN
         WHERE TT2_PERIODO_OP=TRUNC(FECHAOPERACION)
         AND (TT2_TIPOINVERSION IS NULL);
         COMMIT;
-        
+
         UPDATE QA_TTT2_REGISTRO
         SET TT2_TIPOINVERSION = '4'
         WHERE TT2_PERIODO_OP = TRUNC(FECHAOPERACION)
         AND (TT2_TIPOINVERSION = 'T4');
         COMMIT;
 
-  --REPOSICIÓN        
+  --REPOSICIÓN
         --COLOCACION DE LOS REGISTROS DE REPOSICION EN LA TABLA QA_TTT2_REGISTRO
         V_QA_TTT2_REGISTRO.DELETE;
 
         SELECT 	T1.	TT2_CODIGOELEMENTO
         ,	T1.	TT2_IUA
-        ,  (CASE WHEN T1.TT2_ESTADO='RETIRADO' 
-                 THEN T2.TT2_GRUPOCALIDAD  
-                 ELSE T1.TT2_GRUPOCALIDAD 
+        ,  (CASE WHEN T1.TT2_ESTADO='RETIRADO'
+                 THEN T2.TT2_GRUPOCALIDAD
+                 ELSE T1.TT2_GRUPOCALIDAD
             END) AS TT2_GRUPOCALIDAD
         ,	T1.	TT2_IDMERCADO
-        ,  (CASE WHEN T1.TT2_ESTADO='RETIRADO' 
-                 THEN T2.TT2_CAPACIDAD  
-                 ELSE T1.TT2_CAPACIDAD 
+        ,  (CASE WHEN T1.TT2_ESTADO='RETIRADO'
+                 THEN T2.TT2_CAPACIDAD
+                 ELSE T1.TT2_CAPACIDAD
             END) AS TT2_CAPACIDAD
-        ,  (CASE WHEN T1.TT2_ESTADO='RETIRADO' 
-                 THEN T2.TT2_PROPIEDAD  
-                 ELSE T1.TT2_PROPIEDAD 
+        ,  (CASE WHEN T1.TT2_ESTADO='RETIRADO'
+                 THEN T2.TT2_PROPIEDAD
+                 ELSE T1.TT2_PROPIEDAD
             END) AS TT2_PROPIEDAD
-        ,  (CASE WHEN T1.TT2_ESTADO='RETIRADO' 
-                 THEN T2.TT2_TSUBESTACION  
-                 ELSE T1.TT2_TSUBESTACION 
+        ,  (CASE WHEN T1.TT2_ESTADO='RETIRADO'
+                 THEN T2.TT2_TSUBESTACION
+                 ELSE T1.TT2_TSUBESTACION
             END) AS TT2_TSUBESTACION
-        ,  (CASE WHEN T1.TT2_ESTADO='RETIRADO' 
-                 THEN T2.TT2_LONGITUD  
-                 ELSE T1.TT2_LONGITUD 
+        ,  (CASE WHEN T1.TT2_ESTADO='RETIRADO'
+                 THEN T2.TT2_LONGITUD
+                 ELSE T1.TT2_LONGITUD
             END) AS TT2_LONGITUD
-        ,  (CASE WHEN T1.TT2_ESTADO='RETIRADO' 
-                 THEN T2.TT2_LATITUD  
-                 ELSE T1.TT2_LATITUD 
+        ,  (CASE WHEN T1.TT2_ESTADO='RETIRADO'
+                 THEN T2.TT2_LATITUD
+                 ELSE T1.TT2_LATITUD
             END) AS TT2_LATITUD
-        ,  (CASE WHEN T1.TT2_ESTADO='RETIRADO' 
-                 THEN T2.TT2_ALTITUD  
-                 ELSE T1.TT2_ALTITUD 
+        ,  (CASE WHEN T1.TT2_ESTADO='RETIRADO'
+                 THEN T2.TT2_ALTITUD
+                 ELSE T1.TT2_ALTITUD
             END) AS TT2_ALTITUD
         ,	T1.	TT2_ESTADO
         ,	T1.	TT2_ESTADO_BRA11
@@ -450,7 +371,7 @@ BEGIN
         BULK COLLECT INTO V_QA_TTT2_REGISTRO
         FROM QA_TTT2_TEMP T1
         LEFT OUTER JOIN (SELECT TT2_CODIGOELEMENTO
-                            ,   TT2_GRUPOCALIDAD    
+                            ,   TT2_GRUPOCALIDAD
                             ,	TT2_IDMERCADO
                             ,	TT2_CAPACIDAD
                             ,	TT2_PROPIEDAD
@@ -465,7 +386,7 @@ BEGIN
         WHERE T1.TT2_CODIGOELEMENTO IN (
                                         SELECT DISTINCT T1.TT2_CODIGOELEMENTO
                                         FROM QA_TTT2_TEMP T1
-                                        INNER  JOIN (SELECT DISTINCT TT2_CODIGOELEMENTO 
+                                        INNER  JOIN (SELECT DISTINCT TT2_CODIGOELEMENTO
                                                      FROM QA_TTT2_TEMP
                                                      WHERE TT2_ESTADO='OPERACION'
                                                      ) T2 ON T2.TT2_CODIGOELEMENTO=T1.TT2_CODIGOELEMENTO
@@ -476,14 +397,14 @@ BEGIN
                                         )
          AND T1.TT2_FMODIFICACION >= FECHAOPERACION
          AND T1.TT2_CODIGOELEMENTO NOT IN(
-                                          SELECT DISTINCT TT2_CODIGOELEMENTO 
+                                          SELECT DISTINCT TT2_CODIGOELEMENTO
                                           FROM QA_TTT2_REGISTRO
                                           WHERE    TT2_ACTIVOCONEXION    = 1
-                                          OR       TT2_ACTIVOPROVISIONAL = 1         
-                                          )-->NO GENERAR REPORTE DE REPOSICIONES A LOS ACTIVOS DE CONEXION, Y PROVISIONAL - POST          
+                                          OR       TT2_ACTIVOPROVISIONAL = 1
+                                          )-->NO GENERAR REPORTE DE REPOSICIONES A LOS ACTIVOS DE CONEXION, Y PROVISIONAL - POST
         ;
-                            
-        --INSERSION DE LOS REGISTROS DE REPOSICION 
+
+        --INSERSION DE LOS REGISTROS DE REPOSICION
         IF V_QA_TTT2_REGISTRO IS NOT EMPTY THEN
              FOR i IN V_QA_TTT2_REGISTRO.FIRST..V_QA_TTT2_REGISTRO.LAST LOOP
                    INSERT INTO BRAE.QA_TTT2_REGISTRO
@@ -491,11 +412,11 @@ BEGIN
              END LOOP;
              COMMIT;
         END IF;
-        
+
   --VALIDACION DE CAMPOS NULLS Y COLOCACION EN TABLA QA_TTT2_OBS PARA LOS REGISTROS INSERTADOS POR REPOSICION
         V_QA_TTT2_REGISTRO.DELETE;
 
-        SELECT * 
+        SELECT *
         BULK  COLLECT INTO V_QA_TTT2_REGISTRO
         FROM  QA_TTT2_REGISTRO
         WHERE TT2_PERIODO_OP = FECHAOPERACION
@@ -513,8 +434,8 @@ BEGIN
             OR	TT2_IUL	                IS NULL
             )
         AND TT2_CODE_IUA                IS NULL;
-        
-        --INCLUSION EN QA_TTT2_OBS            
+
+        --INCLUSION EN QA_TTT2_OBS
         IF V_QA_TTT2_REGISTRO IS NOT EMPTY THEN
               FOR i IN V_QA_TTT2_REGISTRO.FIRST..V_QA_TTT2_REGISTRO.LAST LOOP
                     --Inserta en tabla de observaciones
@@ -523,46 +444,46 @@ BEGIN
                     --Elimina de la tabla de registros
                     DELETE FROM BRAE.QA_TTT2_REGISTRO
                     WHERE  TT2_CODIGOELEMENTO = V_QA_TTT2_REGISTRO(i).TT2_CODIGOELEMENTO
-                    AND    TT2_CODE_IUA IS NULL;                    
+                    AND    TT2_CODE_IUA IS NULL;
               END LOOP;
               COMMIT;
          END IF;
-         
-        
+
+
         --ASIGNAR UC A LOS REGISTROS INGRESADOS POR EXPANSION Y REPOSICION
             UPDATE BRAE.QA_TTT2_REGISTRO
             SET TT2_UNIDAD_CONSTRUCTIVA = (
             (CASE
-            WHEN	TT2_TSUBESTACION	=	6	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	30	    THEN'N1T54'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	5	    THEN'N1T1'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	7.5	    THEN'N1T2'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	10	    THEN'N1T3'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	15	    THEN'N1T4'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	25	    THEN'N1T5'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	37.5	THEN'N1T6'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	50	    THEN'N1T7'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	75	    THEN'N1T8'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	30	    THEN'N1T5'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	45	    THEN'N1T6'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	100	    THEN'N1T8'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	150	    THEN'N1T8'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	37.5	THEN'N1T6'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	5	    THEN'N1T38'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	7.5	    THEN'N1T39'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	10	    THEN'N1T40'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	15	    THEN'N1T41'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	25	    THEN'N1T42'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	37.5	THEN'N1T43'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	50	    THEN'N1T44'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	75	    THEN'N1T45'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	3	    THEN'N1T38'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	0.5	    THEN'N1T38' --Reconectadores
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'    AND	TT2_CAPACIDAD	=	0.5	    THEN'N1T1'  --Reconectadores
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	30	    THEN'N1T42'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	45	    THEN'N1T43'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	10	    THEN'N1T40'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	5	    THEN'N1T38'
-            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','RT','S','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	37.5	THEN'N1T43'
+            WHEN	TT2_TSUBESTACION	=	6	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	30	    THEN'N1T54'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	5	    THEN'N1T1'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	7.5	    THEN'N1T2'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	10	    THEN'N1T3'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	15	    THEN'N1T4'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	25	    THEN'N1T5'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	37.5	THEN'N1T6'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	50	    THEN'N1T7'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	75	    THEN'N1T8'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	30	    THEN'N1T5'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	45	    THEN'N1T6'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	100	    THEN'N1T8'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	150	    THEN'N1T8'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	37.5	THEN'N1T6'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS','RST')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	5	    THEN'N1T38'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	7.5	    THEN'N1T39'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	10	    THEN'N1T40'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	15	    THEN'N1T41'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	25	    THEN'N1T42'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	37.5	THEN'N1T43'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	50	    THEN'N1T44'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	75	    THEN'N1T45'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	3	    THEN'N1T38'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	0.5	    THEN'N1T38' --Reconectadores
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'URBANO'    AND	TT2_CAPACIDAD	=	0.5	    THEN'N1T1'  --Reconectadores
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	30	    THEN'N1T42'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	45	    THEN'N1T43'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	10	    THEN'N1T40'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	5	    THEN'N1T38'
+            WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RN','RS','RSN','STN','RTN','RT','S','R','T','SN','SR','ST','TN','TR','TS')	AND	TT2_POBLACION	=	'RURAL'	    AND	TT2_CAPACIDAD	=	37.5	THEN'N1T43'
             WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RST','RSTN','RTS','SRT','STR','TRS','TSR')            	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	15	    THEN'N1T9'
             WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RST','RSTN','RTS','SRT','STR','TRS','TSR')    	        AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	20	    THEN'N1T10'
             WHEN	TT2_TSUBESTACION	=	9	AND	TT2_FASES	IN	('RST','RSTN','RTS','SRT','STR','TRS','TSR')            	AND	TT2_POBLACION	=	'URBANO'	AND	TT2_CAPACIDAD	=	30	    THEN'N1T11'
@@ -713,21 +634,21 @@ BEGIN
             WHERE TT2_UNIDAD_CONSTRUCTIVA IS NULL
             AND   TT2_PERIODO_OP=TRUNC(FECHAOPERACION);
             COMMIT;
-  
-        --PASAR A OBSERVACIONES LOS REGISTROS QUE NO CONTIENEN UNA UC VALIDA Y ELIMINAR DE LA TABLA REGISTRO 
+
+        --PASAR A OBSERVACIONES LOS REGISTROS QUE NO CONTIENEN UNA UC VALIDA Y ELIMINAR DE LA TABLA REGISTRO
         INSERT INTO QA_TTT2_OBS
         SELECT * FROM BRAE.QA_TTT2_REGISTRO
         WHERE TT2_UNIDAD_CONSTRUCTIVA = 'N/A#'
         AND   TT2_PERIODO_OP = TRUNC(FECHAOPERACION);
         COMMIT;
-  
+
         --ELIMINAR DE REGISTRO
         DELETE FROM BRAE.QA_TTT2_REGISTRO
         WHERE TT2_UNIDAD_CONSTRUCTIVA = 'N/A#'
         AND   TT2_PERIODO_OP = TRUNC(FECHAOPERACION);
         COMMIT;
-        
-       --MARCAR LOS CAMPOS TIPO_PROYECTO O INVERSION PARA LOS REGISTROS DE REPOSICION 
+
+       --MARCAR LOS CAMPOS TIPO_PROYECTO O INVERSION PARA LOS REGISTROS DE REPOSICION
        --1. identificar el brafo mas antiguo y eliminar
         SELECT TT2_CODIGOELEMENTO
         BULK COLLECT INTO V_ACTIVOS
@@ -737,26 +658,26 @@ BEGIN
         ;
         IF V_ACTIVOS IS NOT EMPTY THEN
              FOR i IN V_ACTIVOS.FIRST..V_ACTIVOS.LAST LOOP
-        
+
                 DELETE
                 FROM BRAE.QA_TTT2_REGISTRO
                 WHERE TT2_CODIGOELEMENTO = V_ACTIVOS(i).TT2_CODIGOELEMENTO
                 AND   TT2_PERIODO_OP = FECHAOPERACION
                 AND   TT2_ALTERNATIVA_VALORACION = 'BRAFO'
                 AND   TT2_FMODIFICACION = (
-                                            SELECT MIN(TT2_FMODIFICACION) 
+                                            SELECT MIN(TT2_FMODIFICACION)
                                             FROM QA_TTT2_REGISTRO
                                             WHERE TT2_CODIGOELEMENTO = V_ACTIVOS(i).TT2_CODIGOELEMENTO
                                             AND   TT2_ALTERNATIVA_VALORACION = 'BRAFO'
                                             AND   TT2_PERIODO_OP = FECHAOPERACION
                                            );
                COMMIT;
-               
+
              END LOOP;
         END IF;
-                
-        
-        --2. actualizar el registro anterior reportado 
+
+
+        --2. actualizar el registro anterior reportado
           ---con estado braen a brafo y periodo operacion actual
         V_ACTIVOS.DELETE;
         SELECT TT2_CODIGOELEMENTO
@@ -767,7 +688,7 @@ BEGIN
         ;
         IF V_ACTIVOS IS NOT EMPTY THEN
              FOR i IN V_ACTIVOS.FIRST..V_ACTIVOS.LAST LOOP
-        
+
                 UPDATE BRAE.QA_TTT2_REGISTRO
                 SET   TT2_PERIODO_OP             = FECHAOPERACION,
                       TT2_ALTERNATIVA_VALORACION = 'BRAFO',
@@ -778,16 +699,16 @@ BEGIN
                 AND   TT2_PERIODO_OP <> FECHAOPERACION
                 AND   TT2_ALTERNATIVA_VALORACION = 'BRAEN';
                COMMIT;
-               
+
              END LOOP;
         END IF;
 
 
-        --3. Identifico de los trafos brafos el siguiente mas antiguo 
+        --3. Identifico de los trafos brafos el siguiente mas antiguo
           --y comparamos las unidades constructivas con el mas atiguo
           --si son diferentes colocar 1 sino 3 en el campo tipo de proyecto; hasta n-1
         V_ACTIVOS.DELETE;
-        
+
         SELECT   TT2_CODIGOELEMENTO
         BULK     COLLECT INTO V_ACTIVOS
         FROM     BRAE.QA_TTT2_REGISTRO
@@ -796,7 +717,7 @@ BEGIN
         ;
         IF V_ACTIVOS IS NOT EMPTY THEN
              FOR i IN V_ACTIVOS.FIRST .. V_ACTIVOS.LAST LOOP
-        
+
                 SELECT   TT2_CODIGOELEMENTO
                         ,TT2_UNIDAD_CONSTRUCTIVA
                         ,TT2_FMODIFICACION
@@ -805,7 +726,7 @@ BEGIN
                 WHERE    TT2_CODIGOELEMENTO =  V_ACTIVOS(i).TT2_CODIGOELEMENTO
                 AND      TT2_PERIODO_OP     =  FECHAOPERACION
                 ORDER BY TT2_FMODIFICACION;
-                
+
                 IF V_ACT_TIPOPROYECTO IS NOT NULL THEN
                         --Modificacion del tipo de proyecto o inversion al elemento existente reportado y en reposicion
                         IF V_ACT_TIPOPROYECTO(1).TT2_UNIDAD_CONSTRUCTIVA = V_ACT_TIPOPROYECTO(2).TT2_UNIDAD_CONSTRUCTIVA THEN
@@ -844,23 +765,23 @@ BEGIN
                         END IF;
                       END LOOP;
                 END IF;
-               
+
              END LOOP;
         END IF;
-        
+
 
       --EXTRAER E IDENTIFICAR LOS ELIMINADOS (DESMANTELADOS) TRANSICION '13'
        V_ACTIVOS.DELETE;
-       
-       SELECT TT2_CODIGOELEMENTO 
+
+       SELECT TT2_CODIGOELEMENTO
        BULK COLLECT INTO V_ACTIVOS
        FROM(
-            (SELECT DISTINCT TT2_CODIGOELEMENTO 
+            (SELECT DISTINCT TT2_CODIGOELEMENTO
              FROM QA_TTT2_REGISTRO
              WHERE TT2_ESTADO = 'OPERACION'
              )
            MINUS
-            (SELECT DISTINCT TT2_CODIGOELEMENTO 
+            (SELECT DISTINCT TT2_CODIGOELEMENTO
              FROM QA_TTT2_TEMP
              WHERE TT2_ESTADO IN ('OPERACION')
              )
@@ -868,15 +789,15 @@ BEGIN
        WHERE TT2_CODIGOELEMENTO NOT IN ((SELECT DISTINCT CODIGO_OPERATIVO
                                         FROM B$CCOMUN@GTECH
                                         WHERE LTT_ID IN (SELECT LTT_ID FROM LTT_IDENTIFIERS@GTECH)
-                                        AND G3E_FNO=20400 
+                                        AND G3E_FNO=20400
                                         AND EMPRESA_ORIGEN='CENS')
                                         UNION ALL
                                         SELECT 'XT00001' FROM DUAL--activo comodin TC2 para usuarios temporales
-                                        );       
-       
+                                        );
+
         IF V_ACTIVOS IS NOT EMPTY THEN
              FOR i IN V_ACTIVOS.FIRST..V_ACTIVOS.LAST LOOP
-        
+
                 UPDATE BRAE.QA_TTT2_REGISTRO
                 SET   TT2_PERIODO_OP             = FECHAOPERACION,
                       TT2_ALTERNATIVA_VALORACION = 'BRAFO',
@@ -887,7 +808,7 @@ BEGIN
                 WHERE TT2_CODIGOELEMENTO = V_ACTIVOS(i).TT2_CODIGOELEMENTO
                 AND   TT2_PERIODO_OP <> FECHAOPERACION;
                 COMMIT;
-               
+
              END LOOP;
         END IF;
 
@@ -897,7 +818,7 @@ BEGIN
        SET TT2_FESTADO =  LAST_DAY(FECHAOPERACION)
        WHERE TT2_PERIODO_OP = FECHAOPERACION;
        COMMIT;
-       
+
 
        --CODIFICACION IUA DE LOS ACTIVOS
         --Contener en V_FORIUA los elementos que no tienen un IUA asignado
@@ -910,16 +831,16 @@ BEGIN
           ON UC.TT2_UNIDAD_CONSTRUCTIVA = T2.TT2_UNIDAD_CONSTRUCTIVA
         WHERE T2.TT2_CODE_IUA IS NULL
         AND   T2.TT2_PERIODO_OP = FECHAOPERACION;
-        
+
         --Identificar el maximo valor numerico base 10 en la base de TT2 actual
         SELECT MAX(TO_NUMBER(QA_FBASE_CONV(SUBSTR(TT2_CODE_IUA,2,5),36,10))) AS MAX_CONSEC
         INTO MAX_CONSECUTIVO_IUA
         FROM BRAE.QA_TTT2_REGISTRO
         WHERE TT2_CODE_IUA IS NOT NULL;
-        
+
         --Asignacion de codigos IUA a todos los elementos del periodo con la funcion QA_FBASE_CONV
         IF V_FORIUA IS NOT EMPTY THEN
-             FOR i IN V_FORIUA.FIRST..V_FORIUA.LAST 
+             FOR i IN V_FORIUA.FIRST..V_FORIUA.LAST
              LOOP
                 UPDATE BRAE.QA_TTT2_REGISTRO
                 SET   TT2_CODE_IUA        =  '1'|| LPAD(QA_FBASE_CONV((MAX_CONSECUTIVO_IUA + i),10,36),5,0)||V_FORIUA(i).TT2_CODIGO_UC
@@ -930,12 +851,12 @@ BEGIN
                 COMMIT;
              END LOOP;
         END IF;
-        
+
         --ACTUALIZACION DE LA INFORMACION CALP
         --Se identifican los cambios en las asignaciones de potencia instalada y se actualiza el valor anterior
         UPDATE QA_TTT2_REGISTRO R
-        SET   TT2_AP_POTENCIA = NVL((SELECT DISTINCT TT2_AP_POTENCIA 
-                                     FROM QA_TTT2_TEMP 
+        SET   TT2_AP_POTENCIA = NVL((SELECT DISTINCT TT2_AP_POTENCIA
+                                     FROM QA_TTT2_TEMP
                                      WHERE TT2_CODIGOELEMENTO = R.TT2_CODIGOELEMENTO
                                      AND   TT2_ESTADO = 'OPERACION')
                                     ,0);
@@ -946,14 +867,14 @@ BEGIN
         INTO MAX_CONSECUTIVO_CALP
         FROM BRAE.QA_TTT2_REGISTRO
         WHERE TT2_CODE_CALP LIKE 'CALP%';
- 
+
         --Borrar codigo CALP a los que tengan potencia CERO y CALP asignada
         UPDATE BRAE.QA_TTT2_REGISTRO
         SET    TT2_CODE_CALP   = '0'
         WHERE  TT2_AP_POTENCIA =  0
-        AND    TT2_CODE_CALP  <> '0';        
+        AND    TT2_CODE_CALP  <> '0';
         COMMIT;
-        
+
         --Asignar CALP a los que tengan potencia mayor a CERO y CALP igual a CERO
         --identificar los transformadores que cumplen la condicion codigo CALP=0 , potencia > 0 y  INVERSION (2,4)
         SELECT DISTINCT TT2_CODIGOELEMENTO
@@ -962,11 +883,11 @@ BEGIN
         WHERE  TT2_AP_POTENCIA >  0
         AND    TT2_CODE_CALP   = '0'
         AND    TT2_TIPOINVERSION IN ('2','4');
-        
-        --asignar CALP a los transformdores de la coleccion anterior, que 
+
+        --asignar CALP a los transformdores de la coleccion anterior, que
         --cumplen la condicion codigo CALP=0, potencia > 0 y  INVERSION (2,4)
         IF V_FORCALP IS NOT EMPTY THEN
-             FOR i IN V_FORCALP.FIRST..V_FORCALP.LAST 
+             FOR i IN V_FORCALP.FIRST..V_FORCALP.LAST
              LOOP
                 UPDATE BRAE.QA_TTT2_REGISTRO
                 SET   TT2_CODE_CALP       =  'CALP'|| LPAD((MAX_CONSECUTIVO_CALP + i),9,0)
@@ -974,14 +895,14 @@ BEGIN
                 COMMIT;
              END LOOP;
         END IF;
-        
-        --actualizar CALP a los transformdores de reposicion, que 
+
+        --actualizar CALP a los transformdores de reposicion, que
         --cumplen la condicion codigo CALP=0, potencia > 0 y  INVERSION (1,3)
         --V_FORCALP.DELETE;
         UPDATE BRAE.QA_TTT2_REGISTRO R
-        SET    R.TT2_CODE_CALP = (SELECT DISTINCT TT2_CODE_CALP 
-                                  FROM   BRAE.QA_TTT2_REGISTRO 
-                                  WHERE  TT2_CODIGOELEMENTO = R.TT2_CODIGOELEMENTO 
+        SET    R.TT2_CODE_CALP = (SELECT DISTINCT TT2_CODE_CALP
+                                  FROM   BRAE.QA_TTT2_REGISTRO
+                                  WHERE  TT2_CODIGOELEMENTO = R.TT2_CODIGOELEMENTO
                                   AND    TT2_CODE_CALP LIKE 'CALP%'
                                   )
         WHERE  R.TT2_AP_POTENCIA >  0
@@ -989,11 +910,11 @@ BEGIN
         AND    R.TT2_TIPOINVERSION IN ('1','3')
         AND    R.TT2_PERIODO_OP = TRUNC(FECHAOPERACION);
         COMMIT;
-       
+
         --ASIGNACION DEL VALOR DE LAS UNIDADES CONSTRUCTIVAS
         UPDATE BRAE.QA_TTT2_REGISTRO R
-        SET    TT2_VALOR_UC   =(SELECT TT2_VALOR_UC 
-                                FROM   QA_TTT2_CODIGO_UC 
+        SET    TT2_VALOR_UC   =(SELECT TT2_VALOR_UC
+                                FROM   QA_TTT2_CODIGO_UC
                                 WHERE  TT2_UNIDAD_CONSTRUCTIVA = R.TT2_UNIDAD_CONSTRUCTIVA
                                 )
         WHERE  TT2_PERIODO_OP = TRUNC(FECHAOPERACION)
@@ -1001,7 +922,7 @@ BEGIN
         COMMIT;
 
 
-        
+
     --TRANSICION DE ACTIVOS DE PROVISIONALES A OPERACION_BRA11
 
         UPDATE QA_TTT2_REGISTRO T
@@ -1011,17 +932,17 @@ BEGIN
            ,T.TT2_ESTADOREPORTE          = 0
            ,T.TT2_OBSERVACIONES          = 'Transicion PLANEACION a OPERACION en BRA11'
            ,T.TT2_ACTIVOPROVISIONAL      = 0
-           ,T.TT2_CAPACIDAD              = (SELECT DISTINCT TT2_CAPACIDAD 
-                                            FROM  QA_TTT2_TEMP 
-                                            WHERE TT2_CODIGOELEMENTO = T.TT2_CODIGOELEMENTO 
+           ,T.TT2_CAPACIDAD              = (SELECT DISTINCT TT2_CAPACIDAD
+                                            FROM  QA_TTT2_TEMP
+                                            WHERE TT2_CODIGOELEMENTO = T.TT2_CODIGOELEMENTO
                                             AND   TT2_ESTADO = 'OPERACION')
         WHERE T.TT2_CODIGOELEMENTO IN (
-                                     SELECT DISTINCT TT2_CODIGOELEMENTO 
+                                     SELECT DISTINCT TT2_CODIGOELEMENTO
                                      FROM QA_TTT2_TEMP
                                      WHERE TT2_ESTADO='OPERACION'
                                      AND   TT2_ACTIVOPROVISIONAL = 0
                                      INTERSECT
-                                     SELECT DISTINCT TT2_CODIGOELEMENTO 
+                                     SELECT DISTINCT TT2_CODIGOELEMENTO
                                      FROM QA_TTT2_REGISTRO
                                      WHERE TT2_ESTADO='OPERACION'
                                      AND   TT2_ACTIVOPROVISIONAL = 1
@@ -1049,26 +970,26 @@ BEGIN
         /*
         UPDATE BRAE.QA_TTT2_REGISTRO T
         SET   TT2_CANTIDAD        = (
-                                           SELECT COUNT(TT2_CODIGOELEMENTO) AS CANTIDAD 
+                                           SELECT COUNT(TT2_CODIGOELEMENTO) AS CANTIDAD
                                            FROM QA_TTT2_REGISTRO
-                                           WHERE TT2_CODIGOELEMENTO = T.TT2_CODIGOELEMENTO                                           
+                                           WHERE TT2_CODIGOELEMENTO = T.TT2_CODIGOELEMENTO
                                            GROUP BY TT2_CODIGOELEMENTO
                                            HAVING COUNT(TT2_CODIGOELEMENTO)>1
                                           )
         WHERE TT2_CODIGOELEMENTO IN (
-                                    SELECT TT2_CODIGOELEMENTO 
-                                    FROM QA_TTT2_REGISTRO                                    
+                                    SELECT TT2_CODIGOELEMENTO
+                                    FROM QA_TTT2_REGISTRO
                                     GROUP BY TT2_CODIGOELEMENTO
                                     HAVING COUNT(TT2_CODIGOELEMENTO)>1
                                     )
         ;
         COMMIT;
-        
+
         --REVISAR CONTEOS DE REPOSCIONES MAYORES A 2 Y ELIMINAR LAS REPOSICIONES INTERMEDIAS
         UPDATE QA_TTT2_REGISTRO T
         SET   T.TT2_CANTIDAD = 0
         WHERE T.TT2_FMODIFICACION  <  (
-                                        SELECT MAX(TT2_FMODIFICACION) AS TT2_MAX_FECHA 
+                                        SELECT MAX(TT2_FMODIFICACION) AS TT2_MAX_FECHA
                                         FROM  QA_TTT2_REGISTRO
                                         WHERE TT2_CANTIDAD>2
                                         AND   TT2_CODIGOELEMENTO = T.TT2_CODIGOELEMENTO
@@ -1076,7 +997,7 @@ BEGIN
                                         GROUP BY TT2_CODIGOELEMENTO
                                       )
         AND   T.TT2_CODIGOELEMENTO IN (
-                                        SELECT TT2_CODIGOELEMENTO 
+                                        SELECT TT2_CODIGOELEMENTO
                                         FROM QA_TTT2_REGISTRO
                                         WHERE TT2_CANTIDAD>2
                                         AND   TT2_ESTADO = 'RETIRADO'
@@ -1085,27 +1006,106 @@ BEGIN
         AND   T.TT2_ESTADO = 'RETIRADO'
         ;
         COMMIT;
-        
+
         INSERT INTO QA_TTT2_OBS
         SELECT * FROM QA_TTT2_REGISTRO
         WHERE TT2_CANTIDAD = 0;
-        COMMIT;  
-        
+        COMMIT;
+
         DELETE FROM QA_TTT2_REGISTRO
         WHERE TT2_CANTIDAD = 0;
-        COMMIT;        
+        COMMIT;
         */
 
-  
-  --Contabilizacion del tiempo o duracion del proceso QA_PTT2_REGISTRO()  
-       HORA_FIN := SYSDATE;   
+
+  --Contabilizacion del tiempo o duracion del proceso QA_PTT2_REGISTRO()
+       HORA_FIN := SYSDATE;
        DBMS_OUTPUT.PUT_LINE('Writing = OFF ..'||HORA_FIN);
        DBMS_OUTPUT.PUT_LINE('Duration of the Process: '||ROUND((HORA_FIN-HORA_INICIO)*24*60,3)||' Minutes');
   ELSE
       DBMS_OUTPUT.PUT_LINE('It´s not possible execution of procediment');
-  END IF; --IF DE INHABILITACION EN REGISTRAR INFORMACION REPORTADA  
+  END IF; --IF DE INHABILITACION EN REGISTRAR INFORMACION REPORTADA
 ---FINALIZACION DEL PROECIEMIENTRO QA_PTT2()
-END QA_PTT2_REGISTRO; 
+END QA_PTT2_REGISTRO;
+WITH INFO_AP AS
+         (SELECT  SUBSTR(CON.NODO_TRANSFORM_V,1,20) AS NODO_TRANSFORM_V,SUM(LUM.POTENCIA) AS POTENCIA_INSTALADA
+          FROM CCONECTIVIDAD_E@GTECH CON
+                   JOIN CCOMUN@GTECH COM ON CON.G3E_FID=COM.G3E_FID
+                   JOIN ELUMINAR_AT@GTECH LUM ON  LUM.G3E_FID = CON.G3E_FID
+          WHERE CON.G3E_FNO = 21400
+          GROUP BY CON.NODO_TRANSFORM_V)
+
+SELECT SUBSTR(CON.NODO_TRANSFORM_V,1,20)          AS TT2_CODIGOELEMENTO
+     ,NULL                                         AS TT2_CODE_IUA --GESTIONADO POR PROCEDIMIENTO
+     ,SUBSTR(COM.GRUPO_CALIDAD,1,2)                AS TT2_GRUPOCALIDAD
+     ,SUBSTR(COM.ID_MERCADO,1,20)                  AS TT2_IDMERCADO
+     ,TO_NUMBER(CON.CAPACIDAD_NOMINAL)             AS TT2_CAPACIDAD_TRAFO
+     ,SUBSTR(CPRO.PROPIETARIO_1,1,20)              AS TT2_PROPIEDAD
+     ,TO_NUMBER(ET.TIPO_SUBESTACION)               AS TT2_TSUBESTACION
+     ,REPLACE(TRIM(COM.COOR_GPS_LON),',','.')      AS TT2_LONGITUD
+     ,REPLACE(TRIM(COM.COOR_GPS_LAT),',','.')      AS TT2_LATITUD
+     ,TO_NUMBER(COM.COOR_Z)                        AS TT2_ALTITUD
+     ,COM.ESTADO                                   AS TT2_ESTADO
+     ,(CASE WHEN(ET.PROVISIONAL = 'SI')
+                THEN('PLANEACION'         )
+            ELSE(COM.ESTADO           )
+    END)                                        AS TT2_ESTADO_BRA11
+     ,'015-2018'                                   AS TT2_RESMETODOLOGIA
+     ,NULL                                         AS TT2_CLASS_CARGA --GESTIONADO POR PROCEDIMIENTO
+     ,SUBSTR(CON.CIRCUITO,1,20)                    AS TT2_NOMBRE_CIRCUITO
+     ,SUBSTR(TT1.TT1_CODIGOCIRCUITO,1,5)           AS TT2_IUL
+     ,NULL                                         AS TT2_CODIGOPROYECTO --INDEFINIDO
+     ,NULL                                         AS TT2_UNIDAD_CONSTRUCTIVA
+     ,DECODE(CPRO.PROPIETARIO_1,'ESTADO',1,0)      AS TT2_RPP
+     ,DECODE(COM.SALINIDAD, 'SI', '1', '2')        AS TT2_SALINIDAD
+     ,(CASE WHEN (COM.TIPO_PROYECTO = 'T4')
+                THEN ('T4'                    )
+            ELSE (NULL                    )
+    END)                                        AS TT2_TIPOINVERSION -- CONFIGURADO POR PROCEDIMIENTO
+     ,2                                            AS TT2_REMUNERACION_PENDIENTE
+     ,DECODE
+    (DECODE(ET.PROVISIONAL,'SI','PLANEACION',COM.ESTADO)
+    ,'PLANEACION','INVA'
+    ,'OPERACION','BRAEN'
+    ,'RETIRADO','BRAFO'
+    )                                          AS TT2_ALTERNATIVA_VALORACION
+     ,NULL                                         AS TT2_ID_PLAN
+     ,0                                            AS TT2_CANTIDAD_REPOSICIONES --GESTIONADO POR PROCEDIMIENTO
+     ,COM.FECHA_OPERACION                          AS TT2_FESTADO --FECHA MANUAL DE OPERACION DEL ACTIVO
+     ,COM.FECHA_COLOCACION                         AS TT2_FCOLOCACION -- FECHA SISTEMA DE CREACION DE ACTIVO
+     ,COM.FECHA_MODIFICACION                       AS TT2_FMODIFICACION --FECHA SISTEMA DE MODIFICACION DE ACTIVO
+     ,COM.USUARIO_COLOCACION                       AS TT2_USR_COLOCACION --PERS
+     ,COM.USUARIO_MODIFICACION                     AS TT2_USR_MODFICACION
+     ,TRUNC(FECHAOPERACION)                        AS TT2_PERIODO_OP
+     ,0                                            AS TT2_ESTADOREPORTE
+     ,SYSDATE                                      AS TT2_FSISTEMA
+     ,0                                            AS TT2_ACTIVOCONEXION --PENDIENTE TRAER DEL SISTEMA GTECH
+     ,(CASE WHEN ET.PROVISIONAL='SI'
+                THEN 1
+            ELSE 0
+    END)                                        AS TT2_ACTIVOPROVISIONAL --PENDIENTE TRAER DEL SISTEMA
+     ,NVL(AP.POTENCIA_INSTALADA,0)                 AS TT2_AP_POTENCIA
+     ,0                                            AS TT2_CODE_CALP
+     ,CON.FASES                                    AS TT2_FASES
+     ,COM.CLASIFICACION_MERCADO                    AS TT2_POBLACION
+     ,NULL                                         AS TT2_VALOR_UC
+     ,NULL                                         AS TT2_OBSERVACIONES
+     ,CON.LOCALIZACION                             AS TT2_LOCALIZACION
+     ,COM.MUNICIPIO                                AS TT2_MUNICIPIO
+     ,COM.DEPARTAMENTO                             AS TT2_DEPARTAMENTO
+     ,/*TO_NUMBER(CON.TENSION)*/ 0                      AS TT2_NT_PRIMARIA
+     ,/*TO_NUMBER(CON.TENSION_SECUNDARIA)*/ 0            AS TT2_NT_SECUNDARIA
+     ,0                                            AS TT2_ACTIVONR
+        BULK COLLECT INTO   V_QA_TTT2_REGISTRO
+FROM                CCONECTIVIDAD_E@GTECH  CON
+                        LEFT OUTER JOIN CCOMUN@GTECH           COM  ON  COM.G3E_FID            = CON.G3E_FID
+                        LEFT OUTER JOIN ETRANSFO_AT@GTECH      ET   ON  ET.G3E_FID             = COM.G3E_FID
+                        LEFT OUTER JOIN CPROPIETARIO@GTECH     CPRO ON  CPRO.G3E_FID           = CON.G3E_FID
+                        LEFT OUTER JOIN QA_TTT1_REGISTRO       TT1  ON  TT1.TT1_NOMBRECIRCUITO = CON.CIRCUITO
+                        LEFT OUTER JOIN INFO_AP                AP   ON AP.NODO_TRANSFORM_V     = SUBSTR(CON.NODO_TRANSFORM_V,1,20)
+WHERE               COM.G3E_FNO = 20400
+  AND                 COM.ESTADO <> 'CONSTRUCCION'
+;
 
 -->IF (COM.G3E_FID <> COM.FID_ANTERIOR) THEN 'REPOSICION' ELSE 'REPARADO' END IF : GESTIONAR ESTE PROCESO PARA LOS REGISTROS DE REPOSICION
 -->PESTAÑA IDENTIFICACION, CAMPO : USO --> ALIMENTADOR CONTROL RECONECTADOR
