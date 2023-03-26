@@ -176,7 +176,6 @@ BEGIN
        --V_QA_TTT2_REGISTRO.DELETE;
 
 
-
         IF V_QA_TTT2_REGISTRO IS NOT EMPTY THEN
              FOR i IN V_QA_TTT2_REGISTRO.FIRST..V_QA_TTT2_REGISTRO.LAST LOOP
                      INSERT INTO BRAE.QA_TTT2_TEMP
@@ -368,6 +367,8 @@ BEGIN
         ,   T1. TT2_NT_PRIMARIA
         ,   T1. TT2_NT_SECUNDARIA
         ,   T1. TT2_ACTIVONR
+        ,   T1. TT2_G3E_FID
+        ,   T1. TT2_FID_ANTERIOR
         BULK COLLECT INTO V_QA_TTT2_REGISTRO
         FROM QA_TTT2_TEMP T1
         LEFT OUTER JOIN (SELECT TT2_CODIGOELEMENTO
@@ -388,20 +389,20 @@ BEGIN
                                         FROM QA_TTT2_TEMP T1
                                         INNER  JOIN (SELECT DISTINCT TT2_CODIGOELEMENTO
                                                      FROM QA_TTT2_TEMP
-                                                     WHERE TT2_ESTADO='OPERACION'
-                                                     ) T2 ON T2.TT2_CODIGOELEMENTO=T1.TT2_CODIGOELEMENTO
-                                        WHERE TT2_ESTADO='RETIRADO'
-                                        AND TO_CHAR(TT2_FMODIFICACION,'MM/YYYY')
-                                          = TO_CHAR(FECHAOPERACION   ,'MM/YYYY')
-                                        AND TT2_ESTADO_BRA11 <> 'PLANEACION'--NO REALIZAR REPOSICIONES SOBRE LOS TRANSFORMADORES EN PLANEACION
+                                                     WHERE TT2_ESTADO = 'OPERACION'
+                                                     AND   TRUNC(TT2_FCOLOCACION,'MM') = TRUNC(FECHAOPERACION)
+                                                     ) T2 ON T2.TT2_CODIGOELEMENTO = T1.TT2_CODIGOELEMENTO
+                                        WHERE TT2_ESTADO = 'RETIRADO'
+                                        AND TRUNC(TT2_FCOLOCACION,  'MM') <= TRUNC(FECHAOPERACION)
+                                        AND TRUNC(TT2_FMODIFICACION,'MM')  = TRUNC(FECHAOPERACION)
                                         )
-         AND T1.TT2_FMODIFICACION >= FECHAOPERACION
-         AND T1.TT2_CODIGOELEMENTO NOT IN(
+        AND T1.TT2_CODIGOELEMENTO NOT IN(
                                           SELECT DISTINCT TT2_CODIGOELEMENTO
                                           FROM QA_TTT2_REGISTRO
                                           WHERE    TT2_ACTIVOCONEXION    = 1
                                           OR       TT2_ACTIVOPROVISIONAL = 1
-                                          )-->NO GENERAR REPORTE DE REPOSICIONES A LOS ACTIVOS DE CONEXION, Y PROVISIONAL - POST
+                                          OR       TT2_ESTADO_BRA11      = 'PLANEACION'--NO REALIZAR REPOSICIONES SOBRE LOS TRANSFORMADORES EN PLANEACION
+                                          )
         ;
 
         --INSERSION DE LOS REGISTROS DE REPOSICION
