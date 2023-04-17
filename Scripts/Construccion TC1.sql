@@ -4701,8 +4701,7 @@ WHERE TC1_IDCOMER <> '604';
 ****************************************************************************************************************/
 
 
---EXPORTAR PARA CERTIFICACION
-
+--TC1_MAR_2023_OR_604
 SELECT TC1_CODCONEX AS CODIGO_TRANSFORMADOR 
 ,TC1_TC1 AS "NIU"
 ,(CASE WHEN(TC1_TIPCONEX='T' AND TC1_CODCONEX NOT LIKE 'ALPM%') 
@@ -4737,7 +4736,7 @@ SELECT TC1_CODCONEX AS CODIGO_TRANSFORMADOR
 ,TC1_EXPENER AS "Exporta Energía"
 ,TC1_CAPAUTOGENR AS "Capacidad Autogenerador kw"
 ,TC1_TIPGENR AS "Tipo de Generación"
-,TC1_CODFRONEXP AS "Codigo frontera Autogenarador"
+,(CASE WHEN TC1_AUTOGEN = '1' THEN 'AGPE0001' ELSE NULL END) AS "Codigo frontera Autogenarador"
 ,TC1_FENTGEN AS "Fecha Entrada en Operación"
 ,TC1_CONTRESP AS "Contrato de Respaldo"
 ,TC1_CAPCONTRESP AS "Capacidad Contrato de Respaldo"

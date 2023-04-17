@@ -312,7 +312,8 @@ BEGIN
 
             --CORREGIR ALGUNOS CARACTERES EN EL CAMPO DIRRECION
             UPDATE QA_TTC1_TEMP
-            SET TC1_DIREC = SUBSTR(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(TC1_DIREC,'�?','A'),'É','E'),'�?','I'),'Ó','O'),'Ú','U'),'á','a'),'é','e'),'í','i'),'ó','o'),'ú','u'),'Ñ','N'),'(',' '),')',' '),'\',' '),'/',' '),',',' '),'.',' '),'°',' '),'À',' '),'1º',' '),'2°',' '),'3°',' '),'º',' '),'·',' '),'ñ','n'),'´',' '),' ',' '),'#',' '),'ª',' '),'Ò',' '),'¿',''),'Â¿',''),'Â',''),1,50)
+            SET TC1_DIREC = SUBSTR(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(TC1_DIREC,'Á','A'),'É','E'),'Í','I'),'Ó','O'),'Ú','U'),'á','a'),'é','e'),'í','i'),'ó','o'),'ú','u'),'Ñ','N'),'(',' '),')',' '),'\',' '),'/',' '),',',' '),'.',' '),'°',' '),'À',' '),'1º',' '),'2°',' '),'3°',' '),'º',' '),'·',' '),'ñ','n'),'´',' '),' ',' '),'#',' '),'ª',' '),'Ò',' '),'¿',''),'Â¿',''),'Â',''),1,50)
+            WHERE ROWNUM >= 0
             ;
             COMMIT;
 
