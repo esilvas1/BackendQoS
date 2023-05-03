@@ -163,6 +163,11 @@ BEGIN
             WHERE  TT2_ESTADO = 'RETIRADO';
             COMMIT;
 
+            --MARCACION DEL CAMPO TT2_CLASS_CARGA
+            UPDATE QA_TTT2_REGISTRO
+                SET TT2_CLASS_CARGA = '1'
+            WHERE ROWNUM >= 0;
+            COMMIT;
 
         END IF;
         
@@ -198,7 +203,7 @@ BEGIN
                    ELSE(COM.ESTADO           )
               END)                                        AS TT2_ESTADO_BRA11
             ,'015-2018'                                   AS TT2_RESMETODOLOGIA
-            ,NULL                                         AS TT2_CLASS_CARGA --GESTIONADO POR PROCEDIMIENTO
+            ,'0'                                          AS TT2_CLASS_CARGA
             ,SUBSTR(CON.CIRCUITO,1,20)                    AS TT2_NOMBRE_CIRCUITO
             ,SUBSTR(TT1.TT1_CODIGOCIRCUITO,1,5)           AS TT2_IUL
             ,NULL                                         AS TT2_CODIGOPROYECTO --INDEFINIDO
@@ -1046,6 +1051,22 @@ BEGIN
                 WHERE BRA11_ESTADO = 2
             )
         ;
+        COMMIT;
+
+        --PASAR TERCERAS REPOSICIONES A LA TABLA QA_TTT2_REP_PEPNDIENTES
+        DELETE FROM QA_TTT2_REP_PENDIENTES
+        WHERE TT2_PERIODO_OP = TRUNC(FECHAOPERACION);
+        COMMIT;
+
+        INSERT INTO QA_TTT2_REP_PENDIENTES
+        SELECT * FROM QA_TTT2_REGISTRO
+        WHERE TT2_ESTADO = 'RETIRADO'
+        AND   TT2_CLASS_CARGA = '0';
+        COMMIT;
+
+        DELETE FROM QA_TTT2_REGISTRO
+        WHERE TT2_ESTADO = 'RETIRADO'
+        AND   TT2_CLASS_CARGA = '0';
         COMMIT;
 
       --REALIZAR EL CONTEO DE REPOSICIONES Y ASIGNAR A LA COLUMNA TT2_CANTIDAD_REPOSICIONES
