@@ -4717,16 +4717,16 @@ SELECT TC1_TC1 AS "NIU"
 ,(TC1_GC) AS "GRUPO CALIDAD"
 ,TC1_CODFRONCOM AS "Código Frontera Comercial"
 ,(TC1_CODCIRC) AS "Código Circuito o Línea"
-,(CASE WHEN(TC1_TIPCONEX='T' AND TC1_CODCONEX NOT LIKE 'ALPM%') 
-       THEN(TT2_CODE_IUA) 
-       ELSE(TC1_IUA)---arreglarlo
-  END) AS "CODIGO TRANFORMADOR"
+,(CASE WHEN(TC1_TIPCONEX='T' AND TC1_CODCONEX NOT LIKE 'ALPM%') THEN (TT2_CODE_IUA)
+       WHEN(TC1_CODCONEX = 'ALPM0001'                         ) THEN ('ALPM0001')
+       WHEN(TC1_TIPCONEX = 'P'                                ) THEN (NULL)
+       END) AS "CODIGO TRANFORMADOR"
 ,(TC1_CODDANE) AS "Código DANE NIU"
 ,(TC1_UBIC) AS "Ubicación"
 ,TC1_DIREC AS "Direccion"
 ,(TC1_CONESP) AS "Condiciones Especiales"
 ,(TC1_CODARESP) AS "TIPO DE AREA ESPECIAL"
-,(TC1_TIPARESP) AS "CODIGO DE AREA ESPECIAL"
+,(CASE WHEN TC1_TIPARESP = 0 THEN '0' ELSE LPAD(TC1_TIPARESP,4,0) END) AS "CODIGO DE AREA ESPECIAL"
 ,(TC1_ESTSECT) AS "Estrato - Sector"
 ,ROUND(TC1_ALTITUD,0) AS "Altitud"
 ,TC1_LONGITUD AS "LONGITUD"
@@ -4753,3 +4753,29 @@ LEFT OUTER JOIN (
                     WHERE TT2_ESTADO='RETIRADO'
                 ) ON TT2_CODIGOELEMENTO = TC1_CODCONEX
 ;
+
+SELECT * FROM QA_TTC1_TEMP
+WHERE TC1_CODDANE = '0500100000';
+
+COMMIT;
+
+
+select count(1) from QA_TTC1_TEMP;
+
+
+
+select * from QA_TTC1_COMERCIALIZADORAS;
+
+
+select * from qa_ttc1_contactos where tc1_nombre like '%jlla%';
+
+
+delete from qa_ttc1_temp;
+
+select * from qa_ttc1_temp;
+
+
+commit;
+
+
+
