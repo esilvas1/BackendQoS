@@ -103,12 +103,12 @@ BEGIN
     
         --ESCRITURA EN TABLA LOG
          INSERT INTO QA_TLOG_EJECUCION
-         SELECT SYSDATE,'QA_PFDDREPORTE','PROCEDIMIENTO','UNKNOWN','EXITOSO','NA' FROM DUAL; 
+         SELECT SYSDATE,'QA_PFDDREPORTE','PROCEDIMIENTO',UPPER(sys_context('USERENV','OS_USER')),'EXITOSO','NA' FROM DUAL;
          
  ELSE
         --ESCRITURA EN TABLA LOG
          INSERT INTO QA_TLOG_EJECUCION
-         SELECT SYSDATE,'QA_PFDDREPORTE','PROCEDIMIENTO','UNKNOWN','FALLIDO','Intenta realizar un periodo ejecutado o un periodo anterior' FROM DUAL; 
+         SELECT SYSDATE,'QA_PFDDREPORTE','PROCEDIMIENTO',UPPER(sys_context('USERENV','OS_USER')),'FALLIDO','Intenta realizar un periodo ejecutado o un periodo anterior' FROM DUAL;
          
  END IF;
 
