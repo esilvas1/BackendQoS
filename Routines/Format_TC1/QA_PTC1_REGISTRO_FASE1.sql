@@ -61,7 +61,7 @@ BEGIN
             ;
 
 
-            --CAMBIAR VALORES DE TIPO_CONEXION (1,2) A (T,P)
+            --CAMBIAR VALORES DE TIPO_CONEXION (1,2) A (P,T) RESPECTIVAMENTE
             UPDATE QA_TTC1_TEMP
             SET TC1_TIPCONEX = 'P'
             WHERE TC1_TIPCONEX = '1';   
