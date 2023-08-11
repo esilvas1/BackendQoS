@@ -158,12 +158,19 @@ BEGIN
 	
    	END IF;
 	--Asignar 	TC1_PERIODO
+   
+   	UPDATE QA_TTC1_TEMP 
+   	SET TC1_PERIODO = TO_CHAR(FECHAOPERACION,'YYYYMM')
+   	WHERE TC1_PERIODO IS NULL;
+   	COMMIT;
 
 	--Eliminar el usuario de la tabla observaciones, luego de verificar que todo ha sido exitoso
 	DELETE FROM QA_TTC1_OBS 
 	WHERE TC1_PERIODO = TO_CHAR(FECHAOPERACION,'YYYYMM')
 	AND   TC1_TC1 = USR;
 	COMMIT;
+
+	MESSAGE := 'El registro se ha insertado exitosamente';
 
 END QA_PTC1_INSERT_OBS;
 
