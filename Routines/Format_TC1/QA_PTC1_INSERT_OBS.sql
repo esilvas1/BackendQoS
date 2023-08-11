@@ -76,8 +76,14 @@ BEGIN
 		--DO NOT ADD IT
 		MESSAGE := 'El usuario que intenta agregar ya existe en la tabla temporal TC1';
 		DBMS_OUTPUT.PUT_LINE('El usuario que intenta agregar ya existe en la tabla temporal TC1');
+	
 		DELETE FROM QA_TTC1_TEMP WHERE TC1_PERIODO IS NULL;
 		COMMIT;
+	
+		INSERT INTO QA_TLOG_EJECUCION
+    	SELECT SYSDATE,'QA_PTC1_INSERT_OBS','PROCEDIMIENTO',UPPER(sys_context('USERENV','OS_USER')),'FALLIDO','Intenta agregar registro existente' FROM DUAL;
+   		COMMIT;
+	
 		RETURN;
 	END IF;
 
@@ -142,8 +148,14 @@ BEGIN
 	IF VAR_VALID = 'NA' THEN
 		MESSAGE := 'El codigo del transformador no es valido';
 		DBMS_OUTPUT.PUT_LINE('El codigo del transformador no es valido');
+	
 		DELETE FROM QA_TTC1_TEMP WHERE TC1_PERIODO IS NULL;
 		COMMIT;
+	
+		INSERT INTO QA_TLOG_EJECUCION
+    	SELECT SYSDATE,'QA_PTC1_INSERT_OBS','PROCEDIMIENTO',UPPER(sys_context('USERENV','OS_USER')),'FALLIDO','Codigo erroneo del transformador' FROM DUAL;
+   		COMMIT;
+
 		RETURN;
 	END IF;
 
@@ -173,8 +185,14 @@ BEGIN
    		
 		MESSAGE := 'El codigo DANE no es valido';
 		DBMS_OUTPUT.PUT_LINE('El codigo DANE no es valido');
+	
 		DELETE FROM QA_TTC1_TEMP WHERE TC1_PERIODO IS NULL;
 		COMMIT;
+	
+		INSERT INTO QA_TLOG_EJECUCION
+    	SELECT SYSDATE,'QA_PTC1_INSERT_OBS','PROCEDIMIENTO',UPPER(sys_context('USERENV','OS_USER')),'FALLIDO','Error en el codigo DANE' FROM DUAL;
+   		COMMIT;
+
 		RETURN;
 	
    	END IF;
@@ -193,6 +211,11 @@ BEGIN
 
 	DBMS_OUTPUT.PUT_LINE('El registro se ha insertado exitosamente');
 	MESSAGE := 'El registro se ha insertado exitosamente';
+
+	INSERT INTO QA_TLOG_EJECUCION
+	SELECT SYSDATE,'QA_PTC1_INSERT_OBS','PROCEDIMIENTO',UPPER(sys_context('USERENV','OS_USER')),'EXITOSO','Procedimiento ejecutado sin errores' FROM DUAL;
+	COMMIT;
+
 
 	--ACTUALIZAR IUL
 	--ACTUALIZAR GRUPO DE CALIDAD
