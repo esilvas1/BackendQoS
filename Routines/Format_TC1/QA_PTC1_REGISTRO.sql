@@ -385,12 +385,12 @@ BEGIN
 
             --IDENTIFICAR LOS CODIGOS DANE QUE NO PERTENCEN AL AREA DE INFLUENCIA DE CENS
             UPDATE QA_TTC1_TEMP
-            SET TC1_CODDANE = 'NA'
+            SET TC1_CODDANE = 0
             WHERE TC1_CODDANE IN (
                                  SELECT DISTINCT TC1_CODDANE
                                  FROM QA_TTC1_TEMP
                                  LEFT OUTER JOIN QA_TTC1_DIVIPOLA ON TC1_CODDANE = TC1_COD_CENTRO_POBLADO
-                                 WHERE TC1_INFLUENCIA_OR = 0
+                                 WHERE TC1_INFLUENCIA_OR IS NULL
                                  )
             ;
             COMMIT;
@@ -399,13 +399,13 @@ BEGIN
 
             INSERT   INTO QA_TTC1_OBS
             SELECT * FROM QA_TTC1_TEMP
-            WHERE TC1_CODDANE  = 'NA'
+            WHERE TC1_CODDANE  = 0
             ;
             COMMIT
             ;
 
             DELETE FROM QA_TTC1_TEMP
-            WHERE TC1_CODDANE  = 'NA'
+            WHERE TC1_CODDANE  = 0
             ;
             COMMIT
             ;
