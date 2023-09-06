@@ -385,7 +385,7 @@ BEGIN
 
             --IDENTIFICAR LOS CODIGOS DANE QUE NO PERTENCEN AL AREA DE INFLUENCIA DE CENS
             UPDATE QA_TTC1_TEMP
-            SET TC1_CODDANE = TC1_CODDANE||'00'
+            SET TC1_CODDANE = 'NA'
             WHERE TC1_CODDANE IN (
                                  SELECT DISTINCT TC1_CODDANE
                                  FROM QA_TTC1_TEMP
@@ -394,6 +394,24 @@ BEGIN
                                  )
             ;
             COMMIT;
+           
+            --REVISAR LOS REGISTROS CON DANE ERRONEO Y PASARLOS A TABLA DE OBSERVACIONES DE TC1
+
+            INSERT   INTO QA_TTC1_OBS
+            SELECT * FROM QA_TTC1_TEMP
+            WHERE TC1_CODDANE  = 'NA'
+            ;
+            COMMIT
+            ;
+
+            DELETE FROM QA_TTC1_TEMP
+            WHERE TC1_CODDANE  = 'NA'
+            ;
+            COMMIT
+            ;
+
+           
+           
 
             --COMPLETAR EL CAMPO CODIGO DE FRONTERA PARA LOS USUARIOS INCUMBENTES CON "OR0001"
             UPDATE QA_TTC1_TEMP
@@ -433,7 +451,7 @@ BEGIN
             COMMIT;
 
 
-            --Actualizar campo FDD_AUTOGENERADOR en la tabla QA_TFDDREFERENCIA, se cre� INDEX para esta busqueda en tabla QA_TTC1_TEMP
+            --Actualizar campo FDD_AUTOGENERADOR en la tabla QA_TFDDREFERENCIA, se cre¿ INDEX para esta busqueda en tabla QA_TTC1_TEMP
             UPDATE BRAE.QA_TFDDREFERENCIA
             SET    FDD_AUTOGENERADOR  = 1
             WHERE  FDD_CODIGOELEMENTO IN (
@@ -465,5 +483,3 @@ BEGIN
         END IF; -- "IF" CONDICIONAL
 
 END QA_PTC1_REGISTRO;
-
-
