@@ -9,7 +9,7 @@ SET  --R.FDD_FINICIAL = (SELECT FDD_FINICIAL FROM QA_TFDDMODIFICADOS WHERE FDD_C
      R.FDD_AJUSTADO='S',
      R.FDD_TIPOAJUSTE=(CASE WHEN ((SELECT DISTINCT(TO_NUMBER(FDD_CAUSA_CREG)) 
                                    FROM QA_TFDDMODIFICADOS 
-                                   WHERE FDD_CODIGOEVENTO=R.FDD_CODIGOEVENTO 
+                                   WHERE FDD_CODIGOEVENTO=R.FDD_CODIGOEVENTO   
                                    AND FDD_ORIGEN='OMS')=0) 
                             THEN 3 
                             ELSE 2 
