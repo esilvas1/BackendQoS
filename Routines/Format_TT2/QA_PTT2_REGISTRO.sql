@@ -314,7 +314,7 @@ BEGIN
         SELECT *
         BULK COLLECT INTO V_QA_TTT2_REGISTRO
         FROM QA_TTT2_REGISTRO
-        WHERE TO_NUMBER(TO_CHAR(TT2_FESTADO,'YYYY')) NOT IN  (TO_NUMBER(TO_CHAR(FECHAOPERACION,'YYYY')), TO_NUMBER(TO_CHAR(FECHAOPERACION,'YYYY')) - 1, 2019)
+        WHERE TO_NUMBER(TO_CHAR(TT2_FESTADO,'YYYY')) NOT IN  (TO_NUMBER(TO_CHAR(FECHAOPERACION,'YYYY')), TO_NUMBER(TO_CHAR(FECHAOPERACION,'YYYY')) - 1)
         AND TT2_PERIODO_OP=TRUNC(FECHAOPERACION);
 
 
@@ -960,8 +960,7 @@ BEGIN
 											  ,TT2_LONGITUD
 											  ,TT2_LATITUD
 											  ,TT2_ALTITUD
-										      ,TT2_NOMBRE_CIRCUITO 
-											  ,TT2_IUL
+										      ,TT2_NOMBRE_CIRCUITO
 										FROM QA_TTT2_REGISTRO
 										WHERE TT2_ESTADO = 'OPERACION'
 										
@@ -972,8 +971,7 @@ BEGIN
 											  ,TT2_LONGITUD
 											  ,TT2_LATITUD
 											  ,TT2_ALTITUD
-											  ,TT2_NOMBRE_CIRCUITO 
-											  ,TT2_IUL 
+											  ,TT2_NOMBRE_CIRCUITO
 										FROM QA_TTT2_TEMP
 										WHERE TT2_ESTADO = 'OPERACION'
 										)
@@ -987,7 +985,6 @@ BEGIN
 									  OR    TT2_LATITUD         IS NULL
 									  OR    TT2_ALTITUD         IS NULL 
 									  OR    TT2_NOMBRE_CIRCUITO IS NULL
-									  OR    TT2_IUL             IS NULL
 									  )						   
 		;
 		COMMIT;
