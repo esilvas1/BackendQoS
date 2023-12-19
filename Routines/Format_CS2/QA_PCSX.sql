@@ -453,7 +453,7 @@ AS
  TYPE T_CSU IS TABLE OF QA_TCSU%ROWTYPE;
  V_TCSU T_CSU;
  CURSOR C_TCSU IS
-  SELECT TC1_TC1 AS CSU_NIU
+  SELECT DISTINCT TC1_TC1 AS CSU_NIU
       ,'' AS CSU_DIU
       ,(CASE WHEN (TC1_TC1 LIKE 'CALP%') THEN (NVL(TX.CSX_DIUM_AP,0)) ELSE(NVL(TX.CSX_DIUM,0)) END) AS CSU_DIUM
       ,'' AS CSU_FIU
@@ -513,38 +513,40 @@ AS
                     CSU.CSU_FRECUENCIA_C13,   CSU.CSU_DURACION_C13,      CSU.CSU_FRECUENCIA_C14,
                     CSU.CSU_DURACION_C14,     CSU.CSU_FRECUENCIA_C15,    CSU.CSU_DURACION_C15,
                     CSU.CSU_PERIODO_OP 
-          FROM QA_TCSU CSU
+          	FROM QA_TCSU CSU
           LEFT OUTER JOIN (SELECT CSU_NIU, SUM(NVL(CSU_DIUM,0)) AS CSU_DIU
-          FROM QA_TCSU
-          WHERE CSU_PERIODO_OP IN (TRUNC(FECHAOPERACION),
-                         ADD_MONTHS(TRUNC(FECHAOPERACION),-1),
-                         ADD_MONTHS(TRUNC(FECHAOPERACION),-2),
-                         ADD_MONTHS(TRUNC(FECHAOPERACION),-3),
-                         ADD_MONTHS(TRUNC(FECHAOPERACION),-4),
-                         ADD_MONTHS(TRUNC(FECHAOPERACION),-5),
-                         ADD_MONTHS(TRUNC(FECHAOPERACION),-6),
-                         ADD_MONTHS(TRUNC(FECHAOPERACION),-7),
-                         ADD_MONTHS(TRUNC(FECHAOPERACION),-8),
-                         ADD_MONTHS(TRUNC(FECHAOPERACION),-9),
-                         ADD_MONTHS(TRUNC(FECHAOPERACION),-10),
-                         ADD_MONTHS(TRUNC(FECHAOPERACION),-11))
-          GROUP BY CSU_NIU) DIU ON DIU.CSU_NIU=CSU.CSU_NIU
+          				   FROM QA_TCSU
+  				           WHERE CSU_PERIODO_OP IN (TRUNC(FECHAOPERACION),
+				                         ADD_MONTHS(TRUNC(FECHAOPERACION),-1),
+				                         ADD_MONTHS(TRUNC(FECHAOPERACION),-2),
+				                         ADD_MONTHS(TRUNC(FECHAOPERACION),-3),
+				                         ADD_MONTHS(TRUNC(FECHAOPERACION),-4),
+				                         ADD_MONTHS(TRUNC(FECHAOPERACION),-5),
+				                         ADD_MONTHS(TRUNC(FECHAOPERACION),-6),
+				                         ADD_MONTHS(TRUNC(FECHAOPERACION),-7),
+				                         ADD_MONTHS(TRUNC(FECHAOPERACION),-8),
+				                         ADD_MONTHS(TRUNC(FECHAOPERACION),-9),
+				                         ADD_MONTHS(TRUNC(FECHAOPERACION),-10),
+				                         ADD_MONTHS(TRUNC(FECHAOPERACION),-11)
+				                         )
+          					  GROUP BY CSU_NIU) DIU ON DIU.CSU_NIU=CSU.CSU_NIU
           LEFT OUTER JOIN (SELECT CSU_NIU, SUM(NVL(CSU_FIUM,0)) AS CSU_FIU
-          FROM QA_TCSU
-          WHERE CSU_PERIODO_OP IN (TRUNC(FECHAOPERACION),
-                         ADD_MONTHS(TRUNC(FECHAOPERACION),-1),
-                         ADD_MONTHS(TRUNC(FECHAOPERACION),-2),
-                         ADD_MONTHS(TRUNC(FECHAOPERACION),-3),
-                         ADD_MONTHS(TRUNC(FECHAOPERACION),-4),
-                         ADD_MONTHS(TRUNC(FECHAOPERACION),-5),
-                         ADD_MONTHS(TRUNC(FECHAOPERACION),-6),
-                         ADD_MONTHS(TRUNC(FECHAOPERACION),-7),
-                         ADD_MONTHS(TRUNC(FECHAOPERACION),-8),
-                         ADD_MONTHS(TRUNC(FECHAOPERACION),-9),
-                         ADD_MONTHS(TRUNC(FECHAOPERACION),-10),
-                         ADD_MONTHS(TRUNC(FECHAOPERACION),-11))
-          GROUP BY CSU_NIU) FIU ON FIU.CSU_NIU=CSU.CSU_NIU  
-          WHERE CSU.CSU_PERIODO_OP=TRUNC(FECHAOPERACION);  
+ 				           FROM QA_TCSU
+				           WHERE CSU_PERIODO_OP IN (TRUNC(FECHAOPERACION),
+				                         ADD_MONTHS(TRUNC(FECHAOPERACION),-1),
+				                         ADD_MONTHS(TRUNC(FECHAOPERACION),-2),
+				                         ADD_MONTHS(TRUNC(FECHAOPERACION),-3),
+				                         ADD_MONTHS(TRUNC(FECHAOPERACION),-4),
+				                         ADD_MONTHS(TRUNC(FECHAOPERACION),-5),
+				                         ADD_MONTHS(TRUNC(FECHAOPERACION),-6),
+				                         ADD_MONTHS(TRUNC(FECHAOPERACION),-7),
+				                         ADD_MONTHS(TRUNC(FECHAOPERACION),-8),
+				                         ADD_MONTHS(TRUNC(FECHAOPERACION),-9),
+				                         ADD_MONTHS(TRUNC(FECHAOPERACION),-10),
+				                         ADD_MONTHS(TRUNC(FECHAOPERACION),-11))
+				           GROUP BY CSU_NIU) FIU ON FIU.CSU_NIU=CSU.CSU_NIU  
+		  WHERE CSU.CSU_PERIODO_OP=TRUNC(FECHAOPERACION)
+         ;  
 
 
 BEGIN
