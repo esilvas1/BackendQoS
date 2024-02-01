@@ -985,6 +985,8 @@ BEGIN
 									  OR    TT2_LATITUD         IS NULL
 									  OR    TT2_ALTITUD         IS NULL 
 									  OR    TT2_NOMBRE_CIRCUITO IS NULL
+									  OR    TT2_NOMBRE_CIRCUITO LIKE '%SAUX%'
+									  OR    TT2_NOMBRE_CIRCUITO IN ('SIN CIRCUITO','ECO')
 									  )						   
 		;
 		COMMIT;
